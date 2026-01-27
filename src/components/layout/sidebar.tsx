@@ -12,8 +12,9 @@ const NAV_ITEMS = [
   { label: 'Inventory', href: '/inventory', icon: FiBox },
   { label: 'Workloads', href: '/workloads', icon: FiServer },
   { label: 'Policy & IAM', href: '/policy', icon: FiShield },
+  { label: 'Configuration', href: '/config', icon: FiSettings },  // Reusing Settings icon for now, usually Sliders or Database
   { label: 'Observability', href: '/observability', icon: FiActivity },
-  { label: 'Settings', href: '/settings', icon: FiSettings },
+  // { label: 'Settings', href: '/settings', icon: FiSettings }, // Move Settings to bottom or keep as general settings
 ];
 
 export function Sidebar() {
