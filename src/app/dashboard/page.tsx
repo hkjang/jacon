@@ -1,9 +1,14 @@
+"use client";
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ActivityFeed } from '@/components/features/dashboard/activity-feed';
 import { FiServer, FiCheckCircle, FiLayers } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
       <div>
@@ -58,8 +63,11 @@ export default function DashboardPage() {
                 <CardTitle>Resource Usage Trends</CardTitle>
              </CardHeader>
              <CardContent>
-                <div className="flex items-center justify-center h-48 border border-dashed border-slate-700 rounded-lg bg-slate-900/50">
-                   <p className="text-slate-500 text-sm">Chart Placeholder (Observability Module)</p>
+                <div className="flex items-center justify-center h-48 border border-dashed border-slate-700 rounded-lg bg-slate-900/50 cursor-pointer hover:bg-slate-900 transition-colors" onClick={() => router.push('/observability')}>
+                   <div className="text-center">
+                      <p className="text-slate-500 text-sm mb-2">View Live Metrics</p>
+                      <p className="text-blue-500 text-xs font-semibold">Click to open Observability Dashboard</p>
+                   </div>
                 </div>
              </CardContent>
           </Card>
