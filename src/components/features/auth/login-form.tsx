@@ -1,100 +1,144 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useAuth } from './auth-context';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import React, { useActionState, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { FiMail, FiLock, FiAlertCircle, FiGithub, FiGlobe } from 'react-icons/fi';
+import { loginAction } from '@/lib/auth-actions';
+
+const initialState = {
+  error: '',
+};
 
 export function LoginForm() {
-  const { login } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      await login(formData.email, formData.password);
-      // Router push is handled in auth-context
-    } catch {
-      setError('Invalid credentials. Try admin@jacon.io / admin');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [state, formAction, isPending] = useActionState(loginAction, initialState);
+  const [activeTab, setActiveTab] = useState<'local' | 'sso'>('local');
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-center">환영합니다</CardTitle>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <Input 
-            label="이메일" 
-            type="email" 
-            placeholder="admin@jacon.io" 
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-            disabled={loading}
-          />
-          <Input 
-            label="비밀번호" 
-            type="password" 
-            placeholder="••••••" 
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-            disabled={loading}
-          />
-          {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-        </CardContent>
-        <CardFooter className="flex-col gap-4">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? '로그인 중...' : '로그인'}
-          </Button>
+    <div className="w-full bg-slate-900 border border-slate-800 rounded-lg p-6 shadow-xl">
+      {/* Tabs */}
+      <div className="flex bg-slate-950 p-1 rounded-md mb-6 border border-slate-800">
+         <button 
+           className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeTab === 'local' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+           onClick={() => setActiveTab('local')}
+           type="button"
+         >
+            로컬 로그인
+         </button>
+         <button 
+           className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeTab === 'sso' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+           onClick={() => setActiveTab('sso')}
+           type="button"
+         >
+            SSO (OIDC)
+         </button>
+      </div>
 
-          {/* Development Helper: Quick Login */}
-          <div className="w-full pt-4 border-t border-slate-800">
-            <p className="text-xs text-slate-500 text-center mb-2">⚡ 개발용 빠른 로그인</p>
-            <div className="grid grid-cols-2 gap-2">
+      {activeTab === 'local' ? (
+          <form action={formAction} className="flex flex-col gap-4">
+            {state?.error && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded text-sm flex items-center gap-2">
+                <FiAlertCircle />
+                {state.error}
+              </div>
+            )}
+            
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-300">이메일</label>
+              <div className="relative">
+                <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Input 
+                  name="email" 
+                  type="email" 
+                  placeholder="name@company.com" 
+                  className="pl-10" 
+                  required 
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-300">비밀번호</label>
+              <div className="relative">
+                <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Input 
+                  name="password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  className="pl-10" 
+                  required 
+                />
+              </div>
+            </div>
+
+            <Button 
+                type="submit" 
+                className="w-full bg-indigo-600 hover:bg-indigo-700 mt-2" 
+                disabled={isPending}
+            >
+              {isPending ? '로그인 중...' : '로그인'}
+            </Button>
+            
+            <div className="text-center mt-2">
+                <a href="#" className="text-xs text-indigo-400 hover:text-indigo-300">비밀번호를 잊으셨나요?</a>
+            </div>
+          </form>
+      ) : (
+          <div className="flex flex-col gap-4 py-4">
+             <div className="text-center text-sm text-slate-400 mb-2">
+                조직 계정으로 로그인하여 SSO를 시작합니다.
+             </div>
+             
+             <Button variant="outline" className="w-full flex items-center justify-center gap-2 h-12 bg-white text-slate-900 hover:bg-slate-100 border-none">
+                <FiGlobe className="text-xl" />
+                <span>Google Workspace 로그인</span>
+             </Button>
+             
+             <Button variant="outline" className="w-full flex items-center justify-center gap-2 h-12 bg-[#24292e] text-white hover:bg-[#2f363d] border-slate-700">
+                <FiGithub className="text-xl" />
+                <span>GitHub Enterprise 로그인</span>
+             </Button>
+             
+             <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3 text-xs text-blue-400 mt-2">
+                <span className="font-bold block mb-1">SSO 정책 안내</span>
+                관리자가 설정한 보안 정책에 따라 MFA 인증이 추가로 요구될 수 있습니다.
+             </div>
+          </div>
+      )}
+      
+      <div className="mt-6 pt-6 border-t border-slate-800">
+        <p className="text-xs text-slate-500 text-center mb-2">⚡ 개발용 빠른 로그인 (Dev Only)</p>
+        <div className="grid grid-cols-2 gap-2">
+            <form action={formAction}>
+                <input type="hidden" name="email" value="kim.cs@jacon.io" />
+                <input type="hidden" name="password" value="password" />
                 <Button 
-                    type="button" 
+                    type="submit" 
                     variant="outline" 
-                    className="text-xs h-auto py-2 flex flex-col items-start gap-1"
-                    onClick={() => {
-                        setFormData({ email: 'kim.cs@jacon.io', password: 'password' });
-                        // Optional: auto submit
-                        login('kim.cs@jacon.io', 'password'); 
-                    }}
+                    className="w-full text-xs h-auto py-2 flex flex-col items-start gap-1"
                 >
                     <span className="font-bold">시스템 관리자</span>
                     <span className="text-[10px] text-slate-400">kim.cs@jacon.io</span>
                 </Button>
+            </form>
+            <form action={formAction}>
+                <input type="hidden" name="email" value="park.jm@jacon.io" />
+                <input type="hidden" name="password" value="password" />
                 <Button 
-                    type="button" 
+                    type="submit" 
                     variant="outline" 
-                    className="text-xs h-auto py-2 flex flex-col items-start gap-1"
-                    onClick={() => {
-                        setFormData({ email: 'park.jm@jacon.io', password: 'password' });
-                        login('park.jm@jacon.io', 'password');
-                    }}
+                    className="w-full text-xs h-auto py-2 flex flex-col items-start gap-1"
                 >
-                    <span className="font-bold">개발자</span>
+                    <span className="font-bold">백엔드 개발자</span>
                     <span className="text-[10px] text-slate-400">park.jm@jacon.io</span>
                 </Button>
-            </div>
-          </div>
-        </CardFooter>
-      </form>
-    </Card>
+            </form>
+        </div>
+      </div>
+
+      <div className="mt-6 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+        © 2025 Jacon Operations. All rights reserved.
+      </div>
+    </div>
   );
 }

@@ -4,6 +4,28 @@ import { Workload, MOCK_WORKLOADS } from './mock-workloads';
 import { AuditLog, MOCK_AUDIT_LOGS } from './mock-audit';
 import { User, MOCK_USERS } from './auth';
 
+// Enterprise Auth Interfaces
+export interface Session {
+  sessionId: string;
+  userId: string;
+  createdAt: string;
+  expiresAt: number; // Timestamp
+  ip: string;
+  userAgent: string;
+  lastActive: number;
+}
+
+export interface ApiToken {
+  id: string;
+  userId: string;
+  name: string;
+  tokenHash: string; // Stored securely
+  scopes: string[];
+  createdAt: string;
+  expiresAt?: string;
+  lastUsed?: string;
+}
+
 // Simulated Database Class
 class MockDatabase {
   private static instance: MockDatabase;
@@ -13,15 +35,24 @@ class MockDatabase {
   public settings: SystemSetting[];
   public workloads: Workload[];
   public auditLogs: AuditLog[];
+  public sessions: Session[];
+  public apiTokens: ApiToken[];
 
   private constructor() {
-    this.users = [...MOCK_USERS];
+    this.users = MOCK_USERS.map(u => ({
+        ...u,
+        passwordHash: 'hashed_password', // Default mock password
+        mfaEnabled: u.role === 'admin', // Admins have MFA by default for testing
+        failedLoginAttempts: 0
+    }));
     this.adminUsers = [...MOCK_ADMIN_USERS];
     this.settings = [...MOCK_SYSTEM_SETTINGS];
     this.workloads = [...MOCK_WORKLOADS];
     this.auditLogs = [...MOCK_AUDIT_LOGS];
+    this.sessions = [];
+    this.apiTokens = [];
     
-    console.log('Mock Database Initialized');
+    console.log('Mock Database Initialized with Enterprise Schema');
   }
 
   public static getInstance(): MockDatabase {
@@ -29,6 +60,101 @@ class MockDatabase {
       MockDatabase.instance = new MockDatabase();
     }
     return MockDatabase.instance;
+  }
+
+  // --- Session Operations ---
+  createSession(userId: string, ip: string, userAgent: string): Session {
+      // Clean up expired sessions first
+      const now = Date.now();
+      this.sessions = this.sessions.filter(s => s.expiresAt > now);
+
+      const session: Session = {
+          sessionId: `sess_${Math.random().toString(36).substring(2)}_${Date.now()}`,
+          userId,
+          createdAt: new Date().toISOString(),
+          expiresAt: now + (24 * 60 * 60 * 1000), // 24 hours
+          ip,
+          userAgent,
+          lastActive: now
+      };
+      this.sessions.push(session);
+      return session;
+  }
+
+  getSession(sessionId: string): Session | undefined {
+      const session = this.sessions.find(s => s.sessionId === sessionId);
+      if (session && session.expiresAt > Date.now()) {
+          session.lastActive = Date.now(); // Touch session
+          return session;
+      }
+      return undefined;
+  }
+
+  revokeSession(sessionId: string) {
+      this.sessions = this.sessions.filter(s => s.sessionId !== sessionId);
+  }
+
+  revokeAllUserSessions(userId: string) {
+      this.sessions = this.sessions.filter(s => s.userId !== userId);
+  }
+
+  getUserSessions(userId: string) {
+      return this.sessions.filter(s => s.userId === userId && s.expiresAt > Date.now());
+  }
+
+  // --- User Auth Operations ---
+  findUserByEmail(email: string) {
+      return this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  }
+
+  incrementFailedLogin(userId: string) {
+      const user = this.users.find(u => u.id === userId);
+      if (user) {
+          user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+          if (user.failedLoginAttempts >= 5) {
+              user.lockUntil = Date.now() + (15 * 60 * 1000); // 15 min lock
+              this.addAuditLog(user.email, 'Security', 'User/Lockout', 'Account locked due to excessive failed attempts', 'High', 'System');
+          }
+      }
+  }
+
+  resetFailedLogin(userId: string) {
+      const user = this.users.find(u => u.id === userId);
+      if (user) {
+          user.failedLoginAttempts = 0;
+          user.lockUntil = undefined;
+      }
+  }
+
+  // --- API Token Operations ---
+  createApiToken(userId: string, name: string, scopes: string[] = ['read']): string {
+      const rawToken = `jat_${Math.random().toString(36).substring(2)}${Math.random().toString(36).substring(2)}`;
+      const tokenHash = `hash_${rawToken}`; // Mock hash
+      
+      this.apiTokens.push({
+          id: `tok_${Date.now()}`,
+          userId,
+          name,
+          tokenHash,
+          scopes,
+          createdAt: new Date().toISOString()
+      });
+      
+      this.addAuditLog(userId, 'Create', 'ApiToken', `Created API token: ${name}`, 'Warning');
+      return rawToken;
+  }
+
+  getApiTokens(userId: string) {
+      return this.apiTokens.filter(t => t.userId === userId);
+  }
+
+  revokeApiToken(id: string) {
+     const idx = this.apiTokens.findIndex(t => t.id === id);
+     if (idx !== -1) {
+         this.apiTokens.splice(idx, 1);
+         return true;
+     }
+     return false;
   }
 
   // --- User Operations ---
@@ -131,7 +257,7 @@ class MockDatabase {
 
   addAuditLog(user: string, action: string, resource: string, details: string, severity: 'Info' | 'High' | 'Critical' | 'Warning' = 'Info', ip: string = '127.0.0.1') {
     const newLog: AuditLog = {
-      id: `evt-${Date.now()}`,
+      id: `evt-${Date.now()}_${Math.random().toString(36).substring(7)}`, // Improved uniqueness
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
       user,
       action,

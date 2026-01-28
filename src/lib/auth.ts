@@ -4,7 +4,13 @@ export interface User {
   name: string;
   email: string;
   role: 'admin' | 'user' | 'readonly';
-  title?: string; // Job title
+  title?: string;
+  // Enterprise Security Fields
+  passwordHash?: string; // Simulated hash
+  mfaEnabled?: boolean;
+  mfaSecret?: string; // Simulated secret
+  failedLoginAttempts?: number;
+  lockUntil?: number; // Timestamp
 }
 
 // Combine Admin Users and some regular users for login testing
