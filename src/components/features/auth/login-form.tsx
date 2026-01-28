@@ -57,10 +57,42 @@ export function LoginForm() {
           />
           {error && <p className="text-sm text-red-500 text-center">{error}</p>}
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex-col gap-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? '로그인 중...' : '로그인'}
           </Button>
+
+          {/* Development Helper: Quick Login */}
+          <div className="w-full pt-4 border-t border-slate-800">
+            <p className="text-xs text-slate-500 text-center mb-2">⚡ 개발용 빠른 로그인</p>
+            <div className="grid grid-cols-2 gap-2">
+                <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="text-xs h-auto py-2 flex flex-col items-start gap-1"
+                    onClick={() => {
+                        setFormData({ email: 'kim.cs@jacon.io', password: 'password' });
+                        // Optional: auto submit
+                        login('kim.cs@jacon.io', 'password'); 
+                    }}
+                >
+                    <span className="font-bold">시스템 관리자</span>
+                    <span className="text-[10px] text-slate-400">kim.cs@jacon.io</span>
+                </Button>
+                <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="text-xs h-auto py-2 flex flex-col items-start gap-1"
+                    onClick={() => {
+                        setFormData({ email: 'park.jm@jacon.io', password: 'password' });
+                        login('park.jm@jacon.io', 'password');
+                    }}
+                >
+                    <span className="font-bold">개발자</span>
+                    <span className="text-[10px] text-slate-400">park.jm@jacon.io</span>
+                </Button>
+            </div>
+          </div>
         </CardFooter>
       </form>
     </Card>
