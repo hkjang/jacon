@@ -1,35 +1,60 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MOCK_ADMIN_USERS, AdminUser } from '@/lib/mock-admin';
-import { FiSearch, FiMoreVertical, FiLock, FiUnlock, FiShield } from 'react-icons/fi';
+import { AdminUser } from '@/lib/mock-admin';
+import { db } from '@/lib/db';
+import { FiSearch, FiMoreVertical, FiLock, FiUnlock, FiShield, FiUserPlus } from 'react-icons/fi';
+
 
 export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [users, setUsers] = useState<AdminUser[]>(MOCK_ADMIN_USERS);
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load users from DB on mount
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = () => {
+    const data = db.getAdminUsers();
+    setUsers([...data]); // Create copy to force re-render
+    setLoading(false);
+  };
+
+  const toggleStatus = (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'Active' ? 'Locked' : 'Active';
+    db.updateAdminUserStatus(id, newStatus);
+    loadUsers(); // Refresh UI
+  };
+
+  const handleInvite = () => {
+     // Mock invite for 'Actual Operation' feel
+     const name = prompt("초대할 사용자 이름 (예: 홍길동):");
+     if (name) {
+         const email = prompt("이메일 주소:");
+         if (email) {
+             db.inviteUser(email, 'Org Admin', name);
+             loadUsers();
+         }
+     }
+  };
 
   const filteredUsers = users.filter(user => 
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const toggleStatus = (id: string) => {
-      setUsers(users.map(u => {
-          if (u.id === id) {
-              return { ...u, status: u.status === 'Active' ? 'Locked' : 'Active' };
-          }
-          return u;
-      }));
-  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
          <h1 className="text-2xl font-bold text-white">사용자 관리</h1>
-         <Button>새 사용자 초대</Button>
+         <Button onClick={handleInvite} className="bg-indigo-600 hover:bg-indigo-700">
+            <FiUserPlus className="mr-2" /> 새 사용자 초대
+         </Button>
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
@@ -84,16 +109,31 @@ export default function UserManagementPage() {
                                      <Button 
                                         variant="ghost" 
                                         size="sm" 
-                                        onClick={() => toggleStatus(user.id)}
+                                        onClick={() => toggleStatus(user.id, user.status)}
                                         title={user.status === 'Active' ? '계정 잠금' : '잠금 해제'}
+                                        className={user.status === 'Active' ? "text-slate-400 hover:text-red-400" : "text-slate-400 hover:text-emerald-400"}
                                      >
                                          {user.status === 'Active' ? <FiLock /> : <FiUnlock />}
                                      </Button>
-                                     <Button variant="ghost" size="sm"><FiMoreVertical /></Button>
+                                     <Button variant="ghost" size="sm" onClick={() => {
+                                         if(confirm('정말 삭제하시겠습니까?')) {
+                                             db.deleteAdminUser(user.id);
+                                             loadUsers();
+                                         }
+                                     }}>
+                                         <FiMoreVertical />
+                                     </Button>
                                  </div>
                              </td>
                          </tr>
                      ))}
+                     {filteredUsers.length === 0 && (
+                         <tr>
+                             <td colSpan={5} className="p-8 text-center text-slate-500">
+                                 사용자가 없습니다.
+                             </td>
+                         </tr>
+                     )}
                  </tbody>
              </table>
          </CardContent>

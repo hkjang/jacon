@@ -1,26 +1,58 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MOCK_SYSTEM_SETTINGS } from '@/lib/mock-admin';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { SystemSetting } from '@/lib/mock-admin';
+import { db } from '@/lib/db';
 import { FiSave, FiAlertTriangle } from 'react-icons/fi';
 
 export default function SystemSettingsPage() {
-  const [settings, setSettings] = useState(MOCK_SYSTEM_SETTINGS);
-  const [hasChanges, setHasChanges] = useState(false);
+   const [settings, setSettings] = useState<SystemSetting[]>([]);
+   const [hasChanges, setHasChanges] = useState(false);
+   const [localUpdates, setLocalUpdates] = useState<Record<string, any>>({});
+   // Unused loading state removed for now or should be used with spinner
 
-  const handleToggle = (key: string) => {
-     setSettings(settings.map(s => {
-         if (s.key === key && typeof s.value === 'boolean') {
-             return { ...s, value: !s.value };
-         }
-         return s;
-     }));
-     setHasChanges(true);
-  };
+   // Load settings
+   useEffect(() => {
+     loadSettings();
+   }, []);
 
-  return (
+   const loadSettings = () => {
+       const data = db.getSettings();
+       // Deep copy to separate UI state from DB state until save
+       setSettings(JSON.parse(JSON.stringify(data)));
+       setHasChanges(false);
+       setLocalUpdates({});
+   };
+
+   const handleToggle = (key: string, currentValue: boolean) => {
+       setLocalUpdates(prev => ({ ...prev, [key]: !currentValue }));
+       setHasChanges(true);
+   };
+   
+   const handleChange = (key: string, value: any) => {
+       setLocalUpdates(prev => ({ ...prev, [key]: value }));
+       setHasChanges(true);
+   };
+
+   const handleSave = () => {
+       Object.entries(localUpdates).forEach(([key, value]) => {
+           db.updateSetting(key, value);
+       });
+       loadSettings(); 
+       alert('설정이 저장되었습니다.');
+   };
+
+   // Helper to get display value (local update > loaded setting)
+   const getValue = (setting: SystemSetting) => {
+       return localUpdates.hasOwnProperty(setting.key) ? localUpdates[setting.key] : setting.value;
+   };
+
+   return (
     <div className="space-y-6 max-w-4xl">
        <div className="flex justify-between items-center">
            <div>
@@ -30,6 +62,7 @@ export default function SystemSettingsPage() {
            <Button 
               disabled={!hasChanges} 
               className={hasChanges ? "bg-indigo-600 hover:bg-indigo-700" : ""}
+              onClick={handleSave}
            >
                <FiSave className="mr-2" /> 변경사항 저장
            </Button>
@@ -44,29 +77,30 @@ export default function SystemSettingsPage() {
                </CardHeader>
                <CardContent className="space-y-6">
                    {settings.filter(s => s.category === 'Security').map(setting => (
-                       <div key={setting.key} className="flex items-center justify-between py-2">
-                           <div>
-                               <div className="font-medium text-slate-200">{setting.label}</div>
-                               <div className="text-xs text-slate-500">Key: {setting.key}</div>
+                       <div key={setting.key} className="flex justify-between items-center">
+                           <div className="space-y-0.5">
+                               <Label className="text-base text-slate-200">{setting.label}</Label>
+                               {setting.description && <p className="text-xs text-slate-500">{setting.description}</p>}
                            </div>
                            
                            {typeof setting.value === 'boolean' ? (
-                               <button 
-                                  onClick={() => handleToggle(setting.key)}
-                                  className={`w-12 h-6 rounded-full transition-colors relative ${setting.value ? 'bg-indigo-600' : 'bg-slate-700'}`}
-                               >
-                                   <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${setting.value ? 'left-7' : 'left-1'}`}></div>
-                               </button>
+                               <Switch 
+                                   checked={getValue(setting) as boolean}
+                                   onCheckedChange={(checked) => handleToggle(setting.key, getValue(setting) as boolean)}
+                               />
                            ) : (
-                               <div className="bg-slate-950 px-3 py-1 rounded border border-slate-800 text-slate-300">
-                                   {setting.value}
-                               </div>
+                               <Input 
+                                   className="w-24 bg-slate-950 border-slate-700 h-8" 
+                                   type="number"
+                                   value={getValue(setting) as string}
+                                   onChange={(e) => handleChange(setting.key, parseInt(e.target.value))}
+                               />
                            )}
                        </div>
                    ))}
                </CardContent>
            </Card>
-
+           
            {/* System Controls */}
            <Card className="bg-slate-900 border-slate-800 border-l-4 border-l-red-500">
                <CardHeader>
@@ -77,25 +111,20 @@ export default function SystemSettingsPage() {
                </CardHeader>
                <CardContent className="space-y-6">
                    {settings.filter(s => s.category === 'System').map(setting => (
-                       <div key={setting.key} className="flex items-center justify-between py-2">
-                           <div>
-                               <div className="font-medium text-slate-200">{setting.label}</div>
-                               <div className="text-xs text-slate-500">Key: {setting.key}</div>
+                       <div key={setting.key} className="flex justify-between items-center">
+                           <div className="space-y-0.5">
+                               <Label className="text-base text-slate-200">{setting.label}</Label>
+                               {setting.description && <p className="text-xs text-slate-500">{setting.description}</p>}
                            </div>
-                           
-                           {typeof setting.value === 'boolean' ? (
-                               <button 
-                                  onClick={() => handleToggle(setting.key)}
-                                  className={`w-12 h-6 rounded-full transition-colors relative ${setting.value ? 'bg-red-600' : 'bg-slate-700'}`}
-                               >
-                                   <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${setting.value ? 'left-7' : 'left-1'}`}></div>
-                               </button>
-                           ) : null}
+                           <Switch 
+                               checked={getValue(setting) as boolean}
+                               onCheckedChange={() => handleToggle(setting.key, getValue(setting) as boolean)}
+                           />
                        </div>
                    ))}
                </CardContent>
            </Card>
        </div>
     </div>
-  );
+   );
 }
