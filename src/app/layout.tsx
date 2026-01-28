@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/components/features/auth/auth-context";
+import { ProjectProvider } from "@/hooks/use-project-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          {children}
+          <ProjectProvider>
+            {children}
+          </ProjectProvider>
         </AuthProvider>
       </body>
     </html>

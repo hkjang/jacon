@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import styles from './sidebar.module.css';
-import { FiGrid, FiBox, FiServer, FiActivity, FiSettings, FiShield } from 'react-icons/fi';
+import { FiGrid, FiBox, FiServer, FiActivity, FiSettings, FiShield, FiLayers } from 'react-icons/fi';
+import { ProjectSwitcher } from '@/components/features/layout/project-switcher';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/dashboard', icon: FiGrid },
   { label: 'Inventory', href: '/inventory', icon: FiBox },
-  { label: 'Workloads', href: '/workloads', icon: FiServer },
+  { label: 'Endpoints', href: '/endpoints', icon: FiServer },
+  { label: 'Workloads', href: '/workloads', icon: FiLayers }, // Changed icon to Layers for Workloads to avoid duplicate
   { label: 'Policy & IAM', href: '/policy', icon: FiShield },
   { label: 'Configuration', href: '/config', icon: FiSettings },  // Reusing Settings icon for now, usually Sliders or Database
   { label: 'Observability', href: '/observability', icon: FiActivity },
@@ -28,6 +30,8 @@ export function Sidebar() {
           <span className={styles.logoText}>Jacon</span>
         </Link>
       </div>
+      
+      <ProjectSwitcher />
       
       <nav className={styles.nav}>
         {NAV_ITEMS.map((item) => {
