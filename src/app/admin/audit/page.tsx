@@ -6,13 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FiSearch, FiDownload, FiFilter } from 'react-icons/fi';
 
-const MOCK_AUDIT_LOGS = [
-    { id: 'evt-1', time: '2024-05-12 10:45:22', user: 'alice@jacon.io', action: 'Login', resource: 'System', details: 'Successful login from IP 192.168.1.1', severity: 'Info' },
-    { id: 'evt-2', time: '2024-05-12 10:50:05', user: 'bob@jacon.io', action: 'Update', resource: 'Policy/P-102', details: 'Changed enforcement mode to "Blocking"', severity: 'High' },
-    { id: 'evt-3', time: '2024-05-12 11:00:00', user: 'System', action: 'Scale', resource: 'Deployment/backend', details: 'Auto-scaled to 5 replicas', severity: 'Info' },
-    { id: 'evt-4', time: '2024-05-12 11:15:40', user: 'dave@external.io', action: 'Delete', resource: 'Secret/db-creds', details: 'Attempted deletion of critical secret', severity: 'Critical' },
-    { id: 'evt-5', time: '2024-05-12 11:16:00', user: 'System', action: 'Block', resource: 'User/dave', details: 'Account locked due to suspicious activity', severity: 'High' },
-];
+import { MOCK_AUDIT_LOGS } from '@/lib/mock-audit';
 
 export default function GlobalAuditPage() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -64,7 +58,7 @@ export default function GlobalAuditPage() {
                    <tbody className="divide-y divide-slate-800">
                        {filteredLogs.map(log => (
                            <tr key={log.id} className="hover:bg-slate-800/10 transition-colors font-mono text-xs">
-                               <td className="p-4 text-slate-400 whitespace-nowrap">{log.time}</td>
+                               <td className="p-4 text-slate-400 whitespace-nowrap">{log.timestamp}</td>
                                <td className="p-4">
                                    <span className={`px-2 py-0.5 rounded ${
                                        log.severity === 'Critical' ? 'bg-red-500/20 text-red-500 font-bold' :
