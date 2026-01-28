@@ -24,14 +24,14 @@ export default function SystemSettingsPage() {
     <div className="space-y-6 max-w-4xl">
        <div className="flex justify-between items-center">
            <div>
-               <h1 className="text-2xl font-bold text-white">System Settings</h1>
-               <p className="text-slate-400 text-sm">Manage global configurations and security policies.</p>
+               <h1 className="text-2xl font-bold text-white">시스템 설정</h1>
+               <p className="text-slate-400 text-sm">전역 구성 및 보안 정책을 관리합니다.</p>
            </div>
            <Button 
               disabled={!hasChanges} 
               className={hasChanges ? "bg-indigo-600 hover:bg-indigo-700" : ""}
            >
-               <FiSave className="mr-2" /> Save Changes
+               <FiSave className="mr-2" /> 변경사항 저장
            </Button>
        </div>
 
@@ -39,8 +39,8 @@ export default function SystemSettingsPage() {
            {/* Security Settings */}
            <Card className="bg-slate-900 border-slate-800">
                <CardHeader>
-                   <CardTitle>Security Policies</CardTitle>
-                   <CardDescription>Authentication and access control settings.</CardDescription>
+                   <CardTitle>보안 정책</CardTitle>
+                   <CardDescription>인증 및 접근 제어 설정</CardDescription>
                </CardHeader>
                <CardContent className="space-y-6">
                    {settings.filter(s => s.category === 'Security').map(setting => (
@@ -71,9 +71,9 @@ export default function SystemSettingsPage() {
            <Card className="bg-slate-900 border-slate-800 border-l-4 border-l-red-500">
                <CardHeader>
                    <CardTitle className="text-red-500 flex items-center gap-2">
-                       <FiAlertTriangle /> Critical System Controls
+                       <FiAlertTriangle /> 중요 시스템 제어
                    </CardTitle>
-                   <CardDescription>These settings affect the availability of the entire platform.</CardDescription>
+                   <CardDescription>이 설정은 전체 플랫폼의 가용성에 영향을 미칩니다.</CardDescription>
                </CardHeader>
                <CardContent className="space-y-6">
                    {settings.filter(s => s.category === 'System').map(setting => (

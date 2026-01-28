@@ -28,8 +28,8 @@ export default function UserManagementPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-         <h1 className="text-2xl font-bold text-white">User Management</h1>
-         <Button>Invite New User</Button>
+         <h1 className="text-2xl font-bold text-white">사용자 관리</h1>
+         <Button>새 사용자 초대</Button>
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
@@ -37,7 +37,7 @@ export default function UserManagementPage() {
              <div className="relative max-w-sm">
                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                  <Input 
-                   placeholder="Search users..." 
+                   placeholder="사용자 검색..." 
                    className="pl-9 bg-slate-950 border-slate-800"
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
@@ -48,11 +48,11 @@ export default function UserManagementPage() {
              <table className="w-full text-left text-sm">
                  <thead className="bg-slate-950/50 text-slate-400 font-medium">
                      <tr>
-                         <th className="p-4">User</th>
-                         <th className="p-4">Role</th>
-                         <th className="p-4">Status</th>
-                         <th className="p-4">Last Login</th>
-                         <th className="p-4 text-right">Actions</th>
+                         <th className="p-4">사용자</th>
+                         <th className="p-4">역할</th>
+                         <th className="p-4">상태</th>
+                         <th className="p-4">마지막 로그인</th>
+                         <th className="p-4 text-right">작업</th>
                      </tr>
                  </thead>
                  <tbody className="divide-y divide-slate-800">
@@ -73,7 +73,7 @@ export default function UserManagementPage() {
                                      user.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500' : 
                                      user.status === 'Locked' ? 'bg-red-500/10 text-red-500' : 'bg-slate-700 text-slate-400'
                                  }`}>
-                                     {user.status}
+                                     {user.status === 'Active' ? '활성' : user.status === 'Locked' ? '잠김' : '대기중'}
                                  </span>
                              </td>
                              <td className="p-4 text-slate-400 font-mono text-xs">
@@ -85,7 +85,7 @@ export default function UserManagementPage() {
                                         variant="ghost" 
                                         size="sm" 
                                         onClick={() => toggleStatus(user.id)}
-                                        title={user.status === 'Active' ? 'Lock Account' : 'Unlock Account'}
+                                        title={user.status === 'Active' ? '계정 잠금' : '잠금 해제'}
                                      >
                                          {user.status === 'Active' ? <FiLock /> : <FiUnlock />}
                                      </Button>

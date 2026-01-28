@@ -9,13 +9,13 @@ import { FiGrid, FiBox, FiServer, FiActivity, FiSettings, FiShield, FiLayers } f
 import { ProjectSwitcher } from '@/components/features/layout/project-switcher';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/dashboard', icon: FiGrid },
-  { label: 'Inventory', href: '/inventory', icon: FiBox },
-  { label: 'Endpoints', href: '/endpoints', icon: FiServer },
-  { label: 'Workloads', href: '/workloads', icon: FiLayers }, // Changed icon to Layers for Workloads to avoid duplicate
-  { label: 'Policy & IAM', href: '/policy', icon: FiShield },
-  { label: 'Configuration', href: '/config', icon: FiSettings },  // Reusing Settings icon for now, usually Sliders or Database
-  { label: 'Observability', href: '/observability', icon: FiActivity },
+  { label: '대시보드', href: '/dashboard', icon: FiGrid },
+  { label: '인벤토리', href: '/inventory', icon: FiBox },
+  { label: '엔드포인트', href: '/endpoints', icon: FiServer },
+  { label: '워크로드', href: '/workloads', icon: FiLayers }, // Changed icon to Layers for Workloads to avoid duplicate
+  { label: '정책 및 IAM', href: '/policy', icon: FiShield },
+  { label: '구성 관리', href: '/config', icon: FiSettings },  // Reusing Settings icon for now, usually Sliders or Database
+  { label: '관측성', href: '/observability', icon: FiActivity },
   // { label: 'Settings', href: '/settings', icon: FiSettings }, // Move Settings to bottom or keep as general settings
 ];
 

@@ -7,7 +7,7 @@ import { FiAlertCircle, FiCpu, FiUsers, FiActivity } from 'react-icons/fi';
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
-       <h1 className="text-2xl font-bold text-white mb-6">Admin Dashboard</h1>
+       <h1 className="text-2xl font-bold text-white mb-6">관리자 대시보드</h1>
        
        {/* Top Metrics */}
        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -18,7 +18,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                    <div className="text-2xl font-bold text-slate-100">1,248</div>
-                   <div className="text-xs text-slate-500 uppercase font-bold">Total Users</div>
+                   <div className="text-xs text-slate-500 uppercase font-bold">전체 사용자</div>
                 </div>
              </CardContent>
           </Card>
@@ -30,7 +30,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                    <div className="text-2xl font-bold text-slate-100">84%</div>
-                   <div className="text-xs text-slate-500 uppercase font-bold">Platform Uptime</div>
+                   <div className="text-xs text-slate-500 uppercase font-bold">플랫폼 가동률</div>
                 </div>
              </CardContent>
           </Card>
@@ -42,7 +42,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                    <div className="text-2xl font-bold text-slate-100">32</div>
-                   <div className="text-xs text-slate-500 uppercase font-bold">Active Alerts</div>
+                   <div className="text-xs text-slate-500 uppercase font-bold">활성 알림</div>
                 </div>
              </CardContent>
           </Card>
@@ -54,7 +54,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                    <div className="text-2xl font-bold text-slate-100">3</div>
-                   <div className="text-xs text-slate-500 uppercase font-bold">Critical Vulnerabilities</div>
+                   <div className="text-xs text-slate-500 uppercase font-bold">심각한 취약점</div>
                 </div>
              </CardContent>
           </Card>
@@ -64,15 +64,15 @@ export default function AdminDashboardPage() {
        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="bg-slate-900 border-slate-800 h-full">
              <CardHeader className="border-b border-slate-800">
-                <CardTitle className="text-base text-slate-200">Recent Security Alerts</CardTitle>
+                <CardTitle className="text-base text-slate-200">최근 보안 알림</CardTitle>
              </CardHeader>
              <CardContent className="p-0">
                 <div className="divide-y divide-slate-800">
                    {[
-                       { msg: 'Unauthorized root access attempt on cluster-alpha', time: '10m ago', severity: 'critical' },
-                       { msg: 'Policy violation: Privileged container blocked', time: '1h ago', severity: 'medium' },
-                       { msg: 'Suspicious login spike from region APAC', time: '3h ago', severity: 'high' },
-                       { msg: 'New admin role assigned to user alice@jacon.io', time: '5h ago', severity: 'low' },
+                       { msg: 'cluster-alpha에 대한 무단 루트 접근 시도', time: '10분 전', severity: 'critical' },
+                       { msg: '정책 위반: 특권 컨테이너 차단됨', time: '1시간 전', severity: 'medium' },
+                       { msg: 'APAC 지역에서 의심스러운 로그인 급증', time: '3시간 전', severity: 'high' },
+                       { msg: '사용자 alice@jacon.io에게 새 관리자 역할 할당', time: '5시간 전', severity: 'low' },
                    ].map((alert, i) => (
                        <div key={i} className="p-4 flex items-start justify-between hover:bg-slate-800/30 transition-colors">
                            <div className="flex gap-3">
@@ -92,14 +92,14 @@ export default function AdminDashboardPage() {
 
           <Card className="bg-slate-900 border-slate-800 h-full">
              <CardHeader className="border-b border-slate-800">
-                <CardTitle className="text-base text-slate-200">System Resources (Global)</CardTitle>
+                <CardTitle className="text-base text-slate-200">시스템 리소스 (글로벌)</CardTitle>
              </CardHeader>
              <CardContent className="p-6">
                  {/* Mock Chart Area */}
                  <div className="space-y-6">
                      <div className="space-y-2">
                          <div className="flex justify-between text-xs text-slate-400">
-                             <span>CPU Usage (Aggregated)</span>
+                             <span>CPU 사용량 (통합)</span>
                              <span>62%</span>
                          </div>
                          <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -109,7 +109,7 @@ export default function AdminDashboardPage() {
                      
                      <div className="space-y-2">
                          <div className="flex justify-between text-xs text-slate-400">
-                             <span>Memory Usage (Aggregated)</span>
+                             <span>메모리 사용량 (통합)</span>
                              <span>78%</span>
                          </div>
                          <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -119,7 +119,7 @@ export default function AdminDashboardPage() {
 
                      <div className="space-y-2">
                          <div className="flex justify-between text-xs text-slate-400">
-                             <span>Storage I/O</span>
+                             <span>스토리지 I/O</span>
                              <span>45%</span>
                          </div>
                          <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -129,7 +129,7 @@ export default function AdminDashboardPage() {
                      
                      <div className="pt-4 border-t border-slate-800">
                          <div className="text-xs text-slate-500 text-center">
-                             System load is within normal parameters. No scaling actions required.
+                             시스템 부하가 정상 범위 내에 있습니다. 스케일링 작업이 필요하지 않습니다.
                          </div>
                      </div>
                  </div>

@@ -25,8 +25,8 @@ export const MOCK_ADMIN_USERS: AdminUser[] = [
 ];
 
 export const MOCK_SYSTEM_SETTINGS: SystemSetting[] = [
-    { key: 'mfa_enforcement', label: 'Enforce MFA for All Admins', value: true, category: 'Security' },
-    { key: 'session_timeout', label: 'Admin Session Timeout (mins)', value: 30, category: 'Security' },
-    { key: 'maintenance_mode', label: 'Maintenance Mode (Read-Only)', value: false, category: 'System' },
-    { key: 'allow_public_endpoints', label: 'Allow Public Endpoints', value: false, category: 'Network' },
+    { key: 'mfa_enforcement', label: '모든 관리자 MFA 강제', value: true, category: 'Security' },
+    { key: 'session_timeout', label: '관리자 세션 타임아웃 (분)', value: 30, category: 'Security' },
+    { key: 'maintenance_mode', label: '유지보수 모드 (읽기 전용)', value: false, category: 'System' },
+    { key: 'allow_public_endpoints', label: '공용 엔드포인트 허용', value: false, category: 'Network' },
 ];

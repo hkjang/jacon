@@ -15,7 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <header className="h-14 border-b border-slate-800 bg-slate-950/50 backdrop-blur flex items-center justify-between px-6 shrink-0">
             <div className="flex items-center gap-4">
                {/* Breadcrumbs or Title could go here */}
-               <h2 className="text-sm font-semibold text-slate-400">Platform Administration</h2>
+               <h2 className="text-sm font-semibold text-slate-400">플랫폼 관리</h2>
             </div>
             
             <div className="flex items-center gap-4">

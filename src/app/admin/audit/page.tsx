@@ -26,13 +26,13 @@ export default function GlobalAuditPage() {
   return (
     <div className="space-y-6">
        <div className="flex justify-between items-center">
-           <h1 className="text-2xl font-bold text-white">Global Audit Logs</h1>
+           <h1 className="text-2xl font-bold text-white">글로벌 감사 로그</h1>
            <div className="flex gap-2">
                <Button variant="outline" className="text-slate-400 border-slate-700 hover:bg-slate-800">
-                   <FiFilter className="mr-2" /> Filter
+                   <FiFilter className="mr-2" /> 필터
                </Button>
                <Button variant="outline" className="text-slate-400 border-slate-700 hover:bg-slate-800">
-                   <FiDownload className="mr-2" /> Export CSV
+                   <FiDownload className="mr-2" /> CSV 내보내기
                </Button>
            </div>
        </div>
@@ -42,7 +42,7 @@ export default function GlobalAuditPage() {
                 <div className="relative max-w-sm">
                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                  <Input 
-                   placeholder="Search logs (User, Action, Resource)..." 
+                   placeholder="로그 검색 (사용자, 작업, 리소스)..." 
                    className="pl-9 bg-slate-950 border-slate-800"
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
@@ -53,12 +53,12 @@ export default function GlobalAuditPage() {
                <table className="w-full text-left text-sm">
                    <thead className="bg-slate-950/50 text-slate-400 font-medium">
                        <tr>
-                           <th className="p-4">Timestamp</th>
-                           <th className="p-4">Severity</th>
-                           <th className="p-4">User</th>
-                           <th className="p-4">Action</th>
-                           <th className="p-4">Resource</th>
-                           <th className="p-4">Details</th>
+                           <th className="p-4">타임스탬프</th>
+                           <th className="p-4">심각도</th>
+                           <th className="p-4">사용자</th>
+                           <th className="p-4">작업</th>
+                           <th className="p-4">리소스</th>
+                           <th className="p-4">세부정보</th>
                        </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-800">
