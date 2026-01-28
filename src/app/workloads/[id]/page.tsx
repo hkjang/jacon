@@ -1,22 +1,28 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
 import { LogViewer } from '@/components/features/workloads/log-viewer';
 import { Terminal } from '@/components/features/workloads/terminal';
 import { MOCK_WORKLOADS } from '@/lib/mock-workloads';
 import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { FiArrowLeft, FiCpu, FiActivity } from 'react-icons/fi';
+import { FiArrowLeft, FiAlertTriangle } from 'react-icons/fi';
 import Link from 'next/link';
+
+import { DriftDetails } from '@/components/features/governance/drift-details';
+import { MOCK_DRIFT_ITEMS } from '@/lib/mock-drift';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { WorkloadOverview } from '@/components/features/workloads/workload-overview';
 
 export default function WorkloadDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const workload = MOCK_WORKLOADS.find(w => w.id === id);
-  const [activeTab, setActiveTab] = useState<'overview' | 'logs' | 'terminal'>('overview');
+  const driftItem = MOCK_DRIFT_ITEMS.find(d => d.resourceName === workload?.name);
+
 
   if (!workload) {
     // In a real app we would use notFound(), but for static build/mock we return UI
@@ -57,90 +63,40 @@ export default function WorkloadDetailPage() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-slate-700">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
-              activeTab === 'overview' ? "border-blue-500 text-blue-500" : "border-transparent text-slate-400 hover:text-slate-200"
-            )}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('logs')}
-            className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
-              activeTab === 'logs' ? "border-blue-500 text-blue-500" : "border-transparent text-slate-400 hover:text-slate-200"
-            )}
-          >
-            Logs
-          </button>
-          <button
-            onClick={() => setActiveTab('terminal')}
-            className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
-              activeTab === 'terminal' ? "border-blue-500 text-blue-500" : "border-transparent text-slate-400 hover:text-slate-200"
-            )}
-          >
-            Terminal
-          </button>
-        </div>
-
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          {activeTab === 'overview' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                    <FiActivity /> Uptime & Restarts
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{workload.age}</div>
-                  <div className="text-sm text-slate-500 mt-1">{workload.restarts} restarts</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                    <FiCpu /> CPU Usage (Est)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">128m</div>
-                  <div className="text-sm text-slate-500 mt-1">Limit: 500m</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                     Memory Usage (Est)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">256Mi</div>
-                  <div className="text-sm text-slate-500 mt-1">Limit: 1Gi</div>
-                </CardContent>
-              </Card>
+        <div className="flex-1 flex flex-col min-h-0">
+             <Tabs defaultValue="overview" className="flex flex-col flex-1 h-full">
+                <div className="border-b border-slate-700">
+                    <TabsList className="bg-transparent p-0 h-auto gap-4">
+                        <TabsTrigger value="overview" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">Overview</TabsTrigger>
+                        <TabsTrigger value="logs" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">Logs</TabsTrigger>
+                        <TabsTrigger value="terminal" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">Terminal</TabsTrigger>
+                        {driftItem && (
+                        <TabsTrigger value="drift" className="border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-amber-500 text-amber-500/80 rounded-none px-4 py-3 text-sm font-medium">
+                            <FiAlertTriangle className="mr-2" /> Drift Detected
+                        </TabsTrigger>
+                        )}
+                    </TabsList>
+                </div>
 
-              <Card className="md:col-span-3">
-                 <CardHeader><CardTitle>Labels</CardTitle></CardHeader>
-                 <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                        <span className="bg-slate-800 px-2 py-1 rounded text-xs">app={workload.name.split('-')[0]}</span>
-                        <span className="bg-slate-800 px-2 py-1 rounded text-xs">env=production</span>
-                        <span className="bg-slate-800 px-2 py-1 rounded text-xs">managed-by=helm</span>
-                    </div>
-                 </CardContent>
-              </Card>
-            </div>
-          )}
+                <TabsContent value="overview" className="flex-1 overflow-y-auto mt-6">
+                    <WorkloadOverview workload={workload} />
+                </TabsContent>
 
-          {activeTab === 'logs' && <LogViewer />}
-          {activeTab === 'terminal' && <Terminal containerName={workload.name} />}
+                <TabsContent value="logs" className="flex-1 overflow-y-auto mt-4 bg-slate-950 border border-slate-800 rounded-lg">
+                    <LogViewer />
+                </TabsContent>
+
+                <TabsContent value="terminal" className="flex-1 overflow-y-auto mt-4 bg-slate-950 border border-slate-800 rounded-lg">
+                    <Terminal containerName={workload.name} />
+                </TabsContent>
+
+                {driftItem && (
+                    <TabsContent value="drift" className="flex-1 overflow-y-auto mt-4">
+                        <DriftDetails item={driftItem} onSync={() => alert('Syncing state... (simulation)')} />
+                    </TabsContent>
+                )}
+             </Tabs>
         </div>
       </div>
     </MainLayout>
