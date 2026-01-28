@@ -33,12 +33,12 @@ export function LoginForm() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-center">Welcome Back</CardTitle>
+        <CardTitle className="text-center">환영합니다</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <Input 
-            label="Email" 
+            label="이메일" 
             type="email" 
             placeholder="admin@jacon.io" 
             value={formData.email}
@@ -47,7 +47,7 @@ export function LoginForm() {
             disabled={loading}
           />
           <Input 
-            label="Password" 
+            label="비밀번호" 
             type="password" 
             placeholder="••••••" 
             value={formData.password}

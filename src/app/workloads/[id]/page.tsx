@@ -6,7 +6,7 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { LogViewer } from '@/components/features/workloads/log-viewer';
 import { Terminal } from '@/components/features/workloads/terminal';
-import { MOCK_WORKLOADS } from '@/lib/mock-workloads';
+import { db } from '@/lib/db';
 import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { FiArrowLeft, FiAlertTriangle } from 'react-icons/fi';
@@ -20,7 +20,18 @@ import { WorkloadOverview } from '@/components/features/workloads/workload-overv
 export default function WorkloadDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const workload = MOCK_WORKLOADS.find(w => w.id === id);
+  // Use db state instead of static mock
+  const [workload, setWorkload] = React.useState(db.getWorkloads().find(w => w.id === id));
+  
+  React.useEffect(() => {
+     // Periodically check for updates (e.g. status change)
+     const interval = setInterval(() => {
+         const current = db.getWorkloads().find(w => w.id === id);
+         setWorkload(prev => JSON.stringify(prev) !== JSON.stringify(current) ? current : prev);
+     }, 1000);
+     return () => clearInterval(interval);
+  }, [id]);
+
   const driftItem = MOCK_DRIFT_ITEMS.find(d => d.resourceName === workload?.name);
 
 
@@ -38,7 +49,7 @@ export default function WorkloadDetailPage() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
+       <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Link href="/workloads">
@@ -57,8 +68,8 @@ export default function WorkloadDetailPage() {
               </span>
             </h1>
             <p className="text-slate-400 text-sm mt-1">
-              Namespace: <span className="text-slate-200">{workload.namespace}</span> • 
-              Cluster: <span className="text-slate-200">{workload.cluster}</span>
+              네임스페이스: <span className="text-slate-200">{workload.namespace}</span> • 
+              클러스터: <span className="text-slate-200">{workload.cluster}</span>
             </p>
           </div>
         </div>
@@ -68,12 +79,12 @@ export default function WorkloadDetailPage() {
              <Tabs defaultValue="overview" className="flex flex-col flex-1 h-full">
                 <div className="border-b border-slate-700">
                     <TabsList className="bg-transparent p-0 h-auto gap-4">
-                        <TabsTrigger value="overview" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">Overview</TabsTrigger>
-                        <TabsTrigger value="logs" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">Logs</TabsTrigger>
-                        <TabsTrigger value="terminal" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">Terminal</TabsTrigger>
+                        <TabsTrigger value="overview" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">개요</TabsTrigger>
+                        <TabsTrigger value="logs" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">로그</TabsTrigger>
+                        <TabsTrigger value="terminal" className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-500 rounded-none px-4 py-3 text-sm font-medium">터미널</TabsTrigger>
                         {driftItem && (
                         <TabsTrigger value="drift" className="border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-amber-500 text-amber-500/80 rounded-none px-4 py-3 text-sm font-medium">
-                            <FiAlertTriangle className="mr-2" /> Drift Detected
+                            <FiAlertTriangle className="mr-2" /> 드리프트 감지됨
                         </TabsTrigger>
                         )}
                     </TabsList>
@@ -93,7 +104,7 @@ export default function WorkloadDetailPage() {
 
                 {driftItem && (
                     <TabsContent value="drift" className="flex-1 overflow-y-auto mt-4">
-                        <DriftDetails item={driftItem} onSync={() => alert('Syncing state... (simulation)')} />
+                        <DriftDetails item={driftItem} onSync={() => alert('동기화 중... (시뮬레이션)')} />
                     </TabsContent>
                 )}
              </Tabs>

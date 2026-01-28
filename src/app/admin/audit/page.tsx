@@ -1,17 +1,24 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FiSearch, FiDownload, FiFilter } from 'react-icons/fi';
+import { FiSearch, FiDownload, FiFilter, FiRefreshCw } from 'react-icons/fi';
+import { db } from '@/lib/db';
+import { AuditLog } from '@/lib/mock-audit';
 
-import { MOCK_AUDIT_LOGS } from '@/lib/mock-audit';
 
 export default function GlobalAuditPage() {
     const [searchTerm, setSearchTerm] = useState('');
-  
-    const filteredLogs = MOCK_AUDIT_LOGS.filter(log => 
+    const [logs, setLogs] = useState<AuditLog[]>([]);
+
+    useEffect(() => {
+        // Load logs on mount and when interactions happen (could be polling, but sim for now)
+        setLogs(db.getAuditLogs());
+    }, []);
+
+    const filteredLogs = logs.filter(log => 
           log.user.toLowerCase().includes(searchTerm.toLowerCase()) || 
           log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
           log.resource.toLowerCase().includes(searchTerm.toLowerCase())
@@ -22,6 +29,9 @@ export default function GlobalAuditPage() {
        <div className="flex justify-between items-center">
            <h1 className="text-2xl font-bold text-white">글로벌 감사 로그</h1>
            <div className="flex gap-2">
+               <Button variant="outline" className="text-slate-400 border-slate-700 hover:bg-slate-800" onClick={() => setLogs(db.getAuditLogs())}>
+                   <FiRefreshCw className="mr-2" /> 새로고침
+               </Button>
                <Button variant="outline" className="text-slate-400 border-slate-700 hover:bg-slate-800">
                    <FiFilter className="mr-2" /> 필터
                </Button>
@@ -81,3 +91,4 @@ export default function GlobalAuditPage() {
     </div>
   );
 }
+

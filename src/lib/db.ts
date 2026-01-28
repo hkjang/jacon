@@ -86,16 +86,40 @@ class MockDatabase {
     return false;
   }
 
+
   // --- Workload Operations ---
   getWorkloads() { return this.workloads; }
   
   getWorkload(id: string) { return this.workloads.find(w => w.id === id); }
 
+  addWorkload(workload: Partial<Workload>) {
+      const newWorkload: Workload = {
+          id: `w-${Date.now()}`,
+          name: workload.name || 'unnamed',
+          namespace: workload.namespace || 'default',
+          type: workload.type || 'Deployment',
+          status: workload.status || 'Pending',
+          cluster: workload.cluster || 'default-cluster',
+          restarts: 0,
+          age: 'Just now',
+          image: workload.image || 'nginx:latest',
+          replicas: workload.replicas || '1/1',
+          cpu: workload.cpu || '100m',
+          memory: workload.memory || '128Mi'
+      };
+      this.workloads.push(newWorkload);
+      return newWorkload;
+  }
+
   updateWorkloadStatus(id: string, status: any) {
       const w = this.workloads.find(w => w.id === id);
       if (w) {
           w.status = status;
-          w.restarts += 1; // Simulate restart
+          if (status === 'Running' && w.status !== 'Running') {
+             // Status recovery
+          } else {
+             w.restarts += 0; // Only increment on crash logic usually
+          }
           this.addAuditLog('System', 'Update', `Workload/${w.name}`, `Status update: ${status}`, 'Info', 'System');
           return w;
       }
@@ -105,7 +129,7 @@ class MockDatabase {
   // --- Audit Operations ---
   getAuditLogs() { return this.auditLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); }
 
-  addAuditLog(user: string, action: string, resource: string, details: string, severity: 'Info' | 'High' | 'Critical' | 'Warning', ip: string) {
+  addAuditLog(user: string, action: string, resource: string, details: string, severity: 'Info' | 'High' | 'Critical' | 'Warning' = 'Info', ip: string = '127.0.0.1') {
     const newLog: AuditLog = {
       id: `evt-${Date.now()}`,
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),

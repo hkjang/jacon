@@ -42,13 +42,13 @@ export function EndpointList() {
       <div className="flex justify-between items-center">
          <div className="w-1/3">
            <Input 
-             placeholder="Search endpoints (name, tags)..." 
+             placeholder="엔드포인트 검색 (이름, 태그)..." 
              value={searchTerm}
              onChange={(e) => setSearchTerm(e.target.value)}
            />
          </div>
          <Button onClick={() => router.push('/endpoints/new')}>
-           <FiPlus className="mr-2" /> Register Endpoint
+           <FiPlus className="mr-2" /> 엔드포인트 등록
          </Button>
       </div>
 
@@ -56,8 +56,8 @@ export function EndpointList() {
         {filteredEndpoints.length === 0 ? (
             <div className="text-center py-12 text-slate-500 border border-dashed border-slate-700 rounded-lg">
                 <FiServer className="mx-auto h-10 w-10 mb-3 opacity-50" />
-                <p>No endpoints found in project <strong>{currentProject.name}</strong>.</p>
-                <Button variant="ghost" className="text-blue-500 hover:text-blue-400 p-0 h-auto" onClick={() => router.push('/endpoints/new')}>Register your first endpoint</Button>
+                <p>프로젝트 <strong>{currentProject.name}</strong>에 엔드포인트가 없습니다.</p>
+                <Button variant="ghost" className="text-blue-500 hover:text-blue-400 p-0 h-auto" onClick={() => router.push('/endpoints/new')}>첫 번째 엔드포인트 등록</Button>
             </div>
         ) : (
             filteredEndpoints.map((ep) => (
@@ -78,7 +78,14 @@ export function EndpointList() {
                             ep.status === 'Warning' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
                             "bg-slate-800 text-slate-500 border-slate-700"
                         )}>
-                            {ep.status}
+                            {(() => {
+                                const map: Record<string, string> = {
+                                    'Online': '온라인',
+                                    'Offline': '오프라인',
+                                    'Warning': '경고'
+                                };
+                                return map[ep.status] || ep.status;
+                            })()}
                         </span>
                      </div>
                      <div className="flex items-center gap-4 text-sm text-slate-400 mt-1">
@@ -105,7 +112,7 @@ export function EndpointList() {
                         className="bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-500/20"
                         onClick={() => handleDeleteClick(ep)}
                       >
-                         Delete
+                         삭제
                       </Button>
                       <Button variant="ghost" size="sm">
                          <FiMoreVertical />
@@ -123,8 +130,8 @@ export function EndpointList() {
              isOpen={deleteModalOpen}
              onClose={() => setDeleteModalOpen(false)}
              onConfirm={handleConfirmDelete}
-             title="Delete Endpoint"
-             description={`Are you sure you want to permanently delete '${selectedEndpoint.name}'? This action cannot be undone.`}
+             title="엔드포인트 삭제"
+             description={`정말 '${selectedEndpoint.name}'을(를) 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
              resourceName={selectedEndpoint.name}
              actionType="delete"
           />

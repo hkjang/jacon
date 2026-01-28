@@ -24,7 +24,7 @@ export default function LoginPage() {
           }}>
             Jacon
           </h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Sign in to your account</p>
+          <p style={{ color: 'var(--text-secondary)' }}>계정에 로그인하세요</p>
         </div>
         
         <LoginForm />

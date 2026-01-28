@@ -14,8 +14,8 @@ export default function PolicyPage() {
       <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold mb-2">Policy & IAM</h1>
-            <p className="text-slate-400">Manage Roles, Bindings and Security Policies.</p>
+            <h1 className="text-2xl font-bold mb-2">정책 및 IAM</h1>
+            <p className="text-slate-400">역할(Role), 바인딩 및 보안 정책을 관리합니다.</p>
           </div>
           <div className="flex bg-slate-800 rounded-lg p-1 gap-1">
              <button
@@ -25,7 +25,7 @@ export default function PolicyPage() {
                  activeTab === 'roles' ? "bg-blue-600 text-white shadow" : "text-slate-400 hover:text-slate-200 hover:bg-slate-700"
                )}
              >
-               Roles & Permissions
+               역할 및 권한
              </button>
              <button
                onClick={() => setActiveTab('audit')}
@@ -34,7 +34,7 @@ export default function PolicyPage() {
                  activeTab === 'audit' ? "bg-blue-600 text-white shadow" : "text-slate-400 hover:text-slate-200 hover:bg-slate-700"
                )}
              >
-               Audit Logs
+               감사 로그
              </button>
           </div>
         </div>

@@ -17,10 +17,10 @@ export function AuditLogViewer() {
   return (
     <div className="flex flex-col gap-4 h-full">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Audit Logs</h3>
+        <h3 className="text-lg font-semibold">감사 로그</h3>
         <div className="w-64">
            <Input 
-             placeholder="Filter user or resource..." 
+             placeholder="사용자 또는 리소스 검색..." 
              value={searchTerm}
              onChange={(e) => setSearchTerm(e.target.value)}
            />
@@ -32,12 +32,12 @@ export function AuditLogViewer() {
           <table className="w-full text-sm text-left">
             <thead className="text-xs uppercase bg-slate-900 text-slate-400 sticky top-0">
               <tr>
-                <th className="px-6 py-3">Timestamp</th>
-                <th className="px-6 py-3">User</th>
-                <th className="px-6 py-3">Action</th>
-                <th className="px-6 py-3">Resource</th>
-                <th className="px-6 py-3">Status</th>
-                <th className="px-6 py-3">IP</th>
+                <th className="px-6 py-3">일시</th>
+                <th className="px-6 py-3">사용자</th>
+                <th className="px-6 py-3">작업</th>
+                <th className="px-6 py-3">리소스</th>
+                <th className="px-6 py-3">상태</th>
+                <th className="px-6 py-3">IP 주소</th>
               </tr>
             </thead>
             <tbody className="font-mono text-xs">
@@ -52,7 +52,7 @@ export function AuditLogViewer() {
                       "px-2 py-0.5 rounded text-[10px] uppercase font-bold",
                       log.status === 'allowed' ? "bg-emerald-900 text-emerald-500" : "bg-red-900 text-red-500"
                     )}>
-                      {log.status}
+                      {log.status === 'allowed' ? '허용됨' : '거부됨'}
                     </span>
                   </td>
                   <td className="px-6 py-3 text-slate-600">{log.ip}</td>

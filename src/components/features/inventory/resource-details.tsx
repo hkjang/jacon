@@ -8,7 +8,7 @@ export function ResourceDetails({ node }: { node: TreeNode | null }) {
   if (!node) {
     return (
       <div className="flex items-center justify-center h-full text-slate-500">
-        Select a resource from the explorer to view details
+        탐색기에서 리소스를 선택하여 상세 정보를 확인하세요
       </div>
     );
   }
@@ -29,9 +29,9 @@ export function ResourceDetails({ node }: { node: TreeNode | null }) {
               <span className="ml-2 text-sm text-slate-200">{node.id}</span>
             </div>
             <div>
-              <span className="text-sm font-medium text-slate-400">Type:</span>
+              <span className="text-sm font-medium text-slate-400">유형:</span>
               <span className="ml-2 text-sm text-slate-200">
-                {node.children ? 'Container/Group' : 'Leaf Resource'}
+                {node.children ? '컨테이너/그룹' : '리프 리소스'}
               </span>
             </div>
             {/* Extended details would go here based on node type */}
@@ -41,12 +41,12 @@ export function ResourceDetails({ node }: { node: TreeNode | null }) {
 
       <Card className="flex-1">
         <CardHeader>
-          <CardTitle>Status</CardTitle>
+          <CardTitle>상태</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-emerald-500 font-medium">Active / Running</div>
+          <div className="text-emerald-500 font-medium">활성 / 실행 중</div>
           <p className="text-sm text-slate-400 mt-2">
-            Resource is healthy and responding to probes.
+            리소스가 정상이며 프로브에 응답하고 있습니다.
           </p>
         </CardContent>
       </Card>

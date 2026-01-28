@@ -9,8 +9,8 @@ export default function ConfigPage() {
     <MainLayout>
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Configuration</h1>
-          <p className="text-slate-400">Manage ConfigMaps and Secrets securely.</p>
+          <h1 className="text-2xl font-bold mb-2">구성 관리</h1>
+          <p className="text-slate-400">ConfigMaps 및 Secret을 안전하게 관리합니다.</p>
         </div>
         <ConfigList />
       </div>

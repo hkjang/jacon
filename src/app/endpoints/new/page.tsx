@@ -24,15 +24,15 @@ export default function NewEndpointPage() {
   return (
     <MainLayout>
       <div className="max-w-2xl mx-auto flex flex-col gap-6">
-        <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4 mb-4">
            <Link href="/endpoints">
               <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0">
                   <FiArrowLeft />
               </Button>
            </Link>
            <div>
-              <h1 className="text-2xl font-bold">Register Endpoint</h1>
-              <p className="text-slate-400">Add a new cluster or host to this project.</p>
+              <h1 className="text-2xl font-bold">엔드포인트 등록</h1>
+              <p className="text-slate-400">이 프로젝트에 새 클러스터 또는 호스트를 추가합니다.</p>
            </div>
         </div>
 
@@ -45,8 +45,8 @@ export default function NewEndpointPage() {
                  <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-2xl">
                     <FiUploadCloud />
                  </div>
-                 <div className="font-bold">Kubernetes Cluster</div>
-                 <p className="text-xs text-slate-400">Import via Kubeconfig file or URL</p>
+                 <div className="font-bold">Kubernetes 클러스터</div>
+                 <p className="text-xs text-slate-400">Kubeconfig 파일 또는 URL을 통해 가져오기</p>
               </CardContent>
            </Card>
            
@@ -58,21 +58,21 @@ export default function NewEndpointPage() {
                  <div className="w-12 h-12 rounded-full bg-blue-400/10 text-blue-400 flex items-center justify-center text-2xl">
                     <FiTerminal />
                  </div>
-                 <div className="font-bold">Docker Engine</div>
-                 <p className="text-xs text-slate-400">Connect via TCP or SSH</p>
+                 <div className="font-bold">Docker 엔진</div>
+                 <p className="text-xs text-slate-400">TCP 또는 SSH를 통해 연결</p>
               </CardContent>
            </Card>
         </div>
 
         <Card>
            <CardHeader>
-              <CardTitle>Connection Details</CardTitle>
+              <CardTitle>연결 세부 정보</CardTitle>
            </CardHeader>
            <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-300">Display Name</label>
-                    <Input placeholder="e.g. Production Cluster US-East" required />
+                    <label className="text-sm font-medium text-slate-300">표시 이름</label>
+                    <Input placeholder="예: Production Cluster US-East" required />
                  </div>
                  
                  {type === 'k8s' ? (
@@ -80,25 +80,25 @@ export default function NewEndpointPage() {
                         <label className="text-sm font-medium text-slate-300">Kubeconfig (YAML)</label>
                         <textarea 
                            className="w-full h-40 bg-slate-950 border border-slate-800 rounded-md p-3 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                           placeholder="Paste your kubeconfig here..."
+                           placeholder="Kubeconfig 내용을 여기에 붙여넣으세요..."
                         />
                      </div>
                  ) : (
                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-300">Host URL</label>
+                        <label className="text-sm font-medium text-slate-300">호스트 URL</label>
                         <Input placeholder="tcp://docker.host:2376" required />
-                        <p className="text-xs text-slate-500">Ensure the Docker daemon API is exposed and accessible.</p>
+                        <p className="text-xs text-slate-500">Docker 데몬 API가 노출되어 있고 접근 가능한지 확인하세요.</p>
                      </div>
                  )}
 
                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-300">Tags (Comma separated)</label>
-                    <Input placeholder="production, aws, east" />
+                    <label className="text-sm font-medium text-slate-300">태그 (쉼표로 구분)</label>
+                    <Input placeholder="production, aws, west" />
                  </div>
 
                  <div className="pt-4 flex justify-end gap-3">
-                    <Button type="button" variant="ghost" onClick={() => router.back()}>Cancel</Button>
-                    <Button type="submit">Verify & Register</Button>
+                    <Button type="button" variant="ghost" onClick={() => router.back()}>취소</Button>
+                    <Button type="submit">검증 및 등록</Button>
                  </div>
               </form>
            </CardContent>

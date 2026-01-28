@@ -9,8 +9,8 @@ export default function WorkloadsPage() {
     <MainLayout>
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Workloads</h1>
-          <p className="text-slate-400">Manage Pods, Deployments and other resources across clusters.</p>
+          <h1 className="text-2xl font-bold mb-2">워크로드</h1>
+          <p className="text-slate-400">클러스터 전반의 파드, 배포 및 기타 리소스를 관리합니다.</p>
         </div>
         <WorkloadList />
       </div>

@@ -16,7 +16,7 @@ export default function InventoryPage() {
         {/* Left Pane: Tree Explorer */}
         <Card className="w-1/3 flex flex-col">
           <div className="p-4 border-b border-slate-700">
-            <h2 className="font-semibold text-lg">Explorer</h2>
+            <h2 className="font-semibold text-lg">탐색기</h2>
           </div>
           <div className="flex-1 overflow-y-auto p-2">
             <TreeView 

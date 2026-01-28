@@ -22,7 +22,7 @@ export function RoleList() {
       <div className="w-1/3 flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <Input 
-            placeholder="Search roles..." 
+            placeholder="역할 검색..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -51,7 +51,7 @@ export function RoleList() {
                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-950 text-slate-400 border border-slate-800">
                     {role.type}
                  </span>
-                 <span className="text-xs text-slate-500">{role.permissions.length} rules</span>
+                 <span className="text-xs text-slate-500">{role.permissions.length} 규칙</span>
               </div>
             </div>
           ))}
@@ -79,8 +79,8 @@ export function RoleList() {
                <table className="w-full text-sm text-left">
                   <thead className="text-xs uppercase bg-slate-800 text-slate-400">
                      <tr>
-                        <th className="px-6 py-3">Resource</th>
-                        <th className="px-6 py-3">Verbs (Actions)</th>
+                        <th className="px-6 py-3">리소스</th>
+                        <th className="px-6 py-3">작업 (Verbs)</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -104,7 +104,7 @@ export function RoleList() {
           </div>
         ) : (
           <div className="h-full flex items-center justify-center text-slate-500">
-            Select a role to view permissions
+            권한을 볼 역할을 선택하세요
           </div>
         )}
       </Card>

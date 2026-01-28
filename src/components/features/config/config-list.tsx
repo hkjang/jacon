@@ -22,13 +22,13 @@ export function ConfigList() {
       <div className="flex justify-between items-center">
          <div className="w-1/3">
            <Input 
-             placeholder="Filter configs..." 
+             placeholder="구성 요소 검색..." 
              value={searchTerm}
              onChange={(e) => setSearchTerm(e.target.value)}
            />
          </div>
          <Button>
-           <FiPlus className="mr-2" /> Create Config
+           <FiPlus className="mr-2" /> 새 구성 생성
          </Button>
       </div>
 
