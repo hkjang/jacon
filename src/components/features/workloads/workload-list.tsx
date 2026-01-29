@@ -5,20 +5,30 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MOCK_WORKLOADS } from '@/lib/mock-workloads';
+import { MOCK_WORKLOADS, Workload } from '@/lib/mock-workloads';
 import { db } from '@/lib/db';
-import { FiRefreshCw, FiMoreVertical } from 'react-icons/fi';
+import { FiRefreshCw, FiMoreVertical, FiEdit2, FiTrash2, FiPlay } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
+import { WorkloadCreateModal } from './workload-create-modal';
+import { WorkloadEditModal } from './workload-edit-modal';
+import { ProtectedActionModal } from '@/components/ui/protected-action-modal';
+import { restartWorkloadAction, deleteWorkloadAction } from '@/lib/actions/workload-actions';
 
 
 export function WorkloadList() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
-  const [workloads, setWorkloads] = useState(MOCK_WORKLOADS); // Init with default
+  const [workloads, setWorkloads] = useState(MOCK_WORKLOADS);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initial load
+  // 모달 상태
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedWorkload, setSelectedWorkload] = useState<Workload | null>(null);
+  const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
+
   React.useEffect(() => {
       loadWorkloads();
   }, []);
@@ -26,7 +36,6 @@ export function WorkloadList() {
   const loadWorkloads = () => {
       setRefreshing(true);
       setError(null);
-      // Simulate network delay
       setTimeout(() => {
           try {
               const data = db.getWorkloads();
@@ -46,18 +55,40 @@ export function WorkloadList() {
       }, 500);
   };
 
-  const handleRestart = (e: React.MouseEvent, id: string) => {
+  const handleRestart = async (e: React.MouseEvent, id: string) => {
       e.stopPropagation();
       if(confirm('재시작 하시겠습니까? (상태가 Pending으로 변경됩니다)')) {
-          db.updateWorkloadStatus(id, 'Pending');
+          await restartWorkloadAction(id);
           loadWorkloads();
-          
-          // Auto recover to Running after 3s
-          setTimeout(() => {
-             db.updateWorkloadStatus(id, 'Running');
-             loadWorkloads(); // This might not update if component unmounted, but okay for mock
-          }, 3000);
       }
+  };
+
+  const handleEdit = (e: React.MouseEvent, workload: Workload) => {
+      e.stopPropagation();
+      setSelectedWorkload(workload);
+      setEditModalOpen(true);
+      setActionMenuOpen(null);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, workload: Workload) => {
+      e.stopPropagation();
+      setSelectedWorkload(workload);
+      setDeleteModalOpen(true);
+      setActionMenuOpen(null);
+  };
+
+  const handleConfirmDelete = async () => {
+      if (selectedWorkload) {
+          await deleteWorkloadAction(selectedWorkload.id);
+          loadWorkloads();
+          setDeleteModalOpen(false);
+          setSelectedWorkload(null);
+      }
+  };
+
+  const toggleActionMenu = (e: React.MouseEvent, id: string) => {
+      e.stopPropagation();
+      setActionMenuOpen(actionMenuOpen === id ? null : id);
   };
 
   const filteredWorkloads = (workloads ?? []).filter(w =>
@@ -80,8 +111,8 @@ export function WorkloadList() {
       )}
       <div className="flex justify-between items-center">
         <div className="flex gap-2 w-full max-w-md">
-          <Input 
-            placeholder="워크로드 검색..." 
+          <Input
+            placeholder="워크로드 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -91,7 +122,7 @@ export function WorkloadList() {
             <FiRefreshCw className={cn("mr-2", refreshing && "animate-spin")} />
             새로고침
           </Button>
-          <Button>
+          <Button onClick={() => setCreateModalOpen(true)}>
             워크로드 생성
           </Button>
         </div>
@@ -106,15 +137,15 @@ export function WorkloadList() {
                 <th className="px-6 py-3">네임스페이스</th>
                 <th className="px-6 py-3">유형</th>
                 <th className="px-6 py-3">상태</th>
+                <th className="px-6 py-3">레플리카</th>
                 <th className="px-6 py-3">재시작</th>
-                <th className="px-6 py-3">생성 경과</th>
                 <th className="px-6 py-3 text-right">작업</th>
               </tr>
             </thead>
             <tbody>
               {filteredWorkloads.map((workload) => (
-                <tr 
-                  key={workload.id} 
+                <tr
+                  key={workload.id}
                   className="border-b border-slate-700 hover:bg-slate-800/50 cursor-pointer transition-colors"
                   onClick={() => router.push(`/workloads/${workload.id}`)}
                 >
@@ -142,25 +173,86 @@ export function WorkloadList() {
                       })()}
                     </span>
                   </td>
+                  <td className="px-6 py-4 text-slate-400">{workload.replicas}</td>
                   <td className="px-6 py-4 text-slate-400">{workload.restarts}</td>
-                  <td className="px-6 py-4 text-slate-400">{workload.age}</td>
                   <td className="px-6 py-4 text-right">
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0" 
-                        onClick={(e) => handleRestart(e, workload.id)}
-                        title="워크로드 재시작"
-                    >
-                      <FiRefreshCw />
-                    </Button>
+                    <div className="flex items-center justify-end gap-1 relative">
+                      <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => handleRestart(e, workload.id)}
+                          title="워크로드 재시작"
+                      >
+                        <FiRefreshCw />
+                      </Button>
+                      <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => handleEdit(e, workload)}
+                          title="워크로드 수정"
+                      >
+                        <FiEdit2 />
+                      </Button>
+                      <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
+                          onClick={(e) => handleDeleteClick(e, workload)}
+                          title="워크로드 삭제"
+                      >
+                        <FiTrash2 />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
+              {filteredWorkloads.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
+                    {searchTerm ? '검색 결과가 없습니다.' : '등록된 워크로드가 없습니다.'}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </CardContent>
       </Card>
+
+      {/* 생성 모달 */}
+      <WorkloadCreateModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSuccess={loadWorkloads}
+      />
+
+      {/* 수정 모달 */}
+      <WorkloadEditModal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedWorkload(null);
+        }}
+        workload={selectedWorkload}
+        onSuccess={loadWorkloads}
+      />
+
+      {/* 삭제 확인 모달 */}
+      {selectedWorkload && (
+        <ProtectedActionModal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setSelectedWorkload(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          title="워크로드 삭제"
+          description={`정말 '${selectedWorkload.name}'을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없으며, 연결된 모든 리소스가 함께 삭제됩니다.`}
+          resourceName={selectedWorkload.name}
+          actionType="delete"
+        />
+      )}
     </div>
   );
 }

@@ -1,28 +1,47 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { db, Endpoint } from '@/lib/db';
-import { FiPlus, FiServer, FiActivity, FiTag, FiMoreVertical, FiWifi } from 'react-icons/fi';
+import { FiPlus, FiServer, FiActivity, FiTag, FiMoreVertical, FiWifi, FiEdit2, FiRefreshCw, FiCheckCircle } from 'react-icons/fi';
 import { SiKubernetes, SiDocker } from 'react-icons/si';
 import { cn } from '@/lib/utils';
 import { useProject } from '@/hooks/use-project-context';
 import { useRouter } from 'next/navigation';
 import { ProtectedActionModal } from '@/components/ui/protected-action-modal';
+import { EndpointCreateModal } from './endpoint-create-modal';
+import { EndpointEditModal } from './endpoint-edit-modal';
+import { deleteEndpointAction, testEndpointConnectionAction } from '@/lib/actions/endpoint-actions';
 
 export function EndpointList() {
   const router = useRouter();
   const { currentProject } = useProject();
   const [searchTerm, setSearchTerm] = useState('');
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [testingId, setTestingId] = useState<string | null>(null);
 
-  const endpoints = db.getEndpoints();
-  const filteredEndpoints = endpoints.filter(ep => 
-    ep.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  useEffect(() => {
+    loadEndpoints();
+  }, []);
+
+  const loadEndpoints = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setEndpoints([...db.getEndpoints()]);
+      setRefreshing(false);
+    }, 300);
+  };
+
+  const filteredEndpoints = endpoints.filter(ep =>
+    ep.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     ep.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
@@ -31,26 +50,49 @@ export function EndpointList() {
       setDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-      // API call would go here
+  const handleEditClick = (ep: Endpoint) => {
+      setSelectedEndpoint(ep);
+      setEditModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+      if (selectedEndpoint) {
+        await deleteEndpointAction(selectedEndpoint.id);
+        loadEndpoints();
+      }
       setDeleteModalOpen(false);
       setSelectedEndpoint(null);
-      // In a real app we'd refresh the list here
+  };
+
+  const handleTestConnection = async (ep: Endpoint) => {
+      setTestingId(ep.id);
+      try {
+        await testEndpointConnectionAction(ep.id);
+        loadEndpoints();
+      } finally {
+        setTestingId(null);
+      }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
          <div className="w-1/3">
-           <Input 
-             placeholder="엔드포인트 검색 (이름, 태그)..." 
+           <Input
+             placeholder="엔드포인트 검색 (이름, 태그)..."
              value={searchTerm}
              onChange={(e) => setSearchTerm(e.target.value)}
            />
          </div>
-         <Button onClick={() => router.push('/endpoints/new')}>
-           <FiPlus className="mr-2" /> 엔드포인트 등록
-         </Button>
+         <div className="flex gap-2">
+           <Button variant="outline" size="sm" onClick={loadEndpoints} disabled={refreshing}>
+             <FiRefreshCw className={cn("mr-2", refreshing && "animate-spin")} />
+             새로고침
+           </Button>
+           <Button onClick={() => setCreateModalOpen(true)}>
+             <FiPlus className="mr-2" /> 엔드포인트 등록
+           </Button>
+         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -110,16 +152,35 @@ export function EndpointList() {
 
                   {/* Actions - Visible on hover or focused */}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <Button 
-                        variant="danger" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTestConnection(ep)}
+                        disabled={testingId === ep.id}
+                        title="연결 테스트"
+                      >
+                        {testingId === ep.id ? (
+                          <FiRefreshCw className="animate-spin" />
+                        ) : (
+                          <FiCheckCircle />
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditClick(ep)}
+                        title="수정"
+                      >
+                        <FiEdit2 />
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
                         className="bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-500/20"
                         onClick={() => handleDeleteClick(ep)}
+                        title="삭제"
                       >
                          삭제
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                         <FiMoreVertical />
                       </Button>
                   </div>
                 </CardContent>
@@ -128,11 +189,32 @@ export function EndpointList() {
         )}
       </div>
 
-      {/* Safety Modal */}
+      {/* 생성 모달 */}
+      <EndpointCreateModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSuccess={loadEndpoints}
+      />
+
+      {/* 수정 모달 */}
+      <EndpointEditModal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedEndpoint(null);
+        }}
+        endpoint={selectedEndpoint}
+        onSuccess={loadEndpoints}
+      />
+
+      {/* 삭제 확인 모달 */}
       {selectedEndpoint && (
-          <ProtectedActionModal 
+          <ProtectedActionModal
              isOpen={deleteModalOpen}
-             onClose={() => setDeleteModalOpen(false)}
+             onClose={() => {
+               setDeleteModalOpen(false);
+               setSelectedEndpoint(null);
+             }}
              onConfirm={handleConfirmDelete}
              title="엔드포인트 삭제"
              description={`정말 '${selectedEndpoint.name}'을(를) 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
