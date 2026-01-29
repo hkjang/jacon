@@ -58,7 +58,7 @@ export default function StacksPage() {
                                                 {stack.type}
                                             </span>
                                             <span className="text-xs text-slate-500">
-                                                Updated {new Date(stack.updatedAt).toLocaleDateString()}
+                                                수정됨 {new Date(stack.updatedAt).toLocaleDateString()}
                                             </span>
                                         </CardDescription>
                                     </div>
@@ -75,17 +75,17 @@ export default function StacksPage() {
                         <CardContent>
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between text-sm p-2 bg-slate-900 rounded">
-                                    <span className="text-slate-500 flex items-center gap-2"><FiServer /> Endpoint</span>
+                                    <span className="text-slate-500 flex items-center gap-2"><FiServer /> 엔드포인트</span>
                                     <span className="text-slate-300 font-medium">{stack.endpointId}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm p-2 bg-slate-900 rounded">
-                                    <span className="text-slate-500 flex items-center gap-2"><FiActivity /> Resources</span>
-                                    <span className="text-slate-300 font-medium">Coming soon</span>
+                                    <span className="text-slate-500 flex items-center gap-2"><FiActivity /> 리소스</span>
+                                    <span className="text-slate-300 font-medium">준비 중</span>
                                 </div>
                             </div>
                             <Link href={`/stacks/${stack.id}`} className="block mt-4">
                                 <Button variant="outline" className="w-full group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600">
-                                    Manage Stack
+                                    스택 관리
                                 </Button>
                             </Link>
                         </CardContent>

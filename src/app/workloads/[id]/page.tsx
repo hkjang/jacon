@@ -20,17 +20,42 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function WorkloadDetailPage() {
   const params = useParams();
-  const id = params.id as string;
-  const [workload, setWorkload] = React.useState(db.getWorkloads().find(w => w.id === id));
-  
+  const id = params?.id as string;
+
+  // Initialize workload state safely
+  const [workload, setWorkload] = React.useState(() => {
+    if (!id) return undefined;
+    const workloads = db.getWorkloads();
+    return workloads?.find(w => w.id === id);
+  });
+
   // Simulated metric data
   const [metricData, setMetricData] = useState<{timestamp: string, value: number}[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Skip if no valid ID
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    // Initial load
+    const workloads = db.getWorkloads();
+    const initial = workloads?.find(w => w.id === id);
+    setWorkload(initial);
+    setLoading(false);
+
     // Periodically check for updates (e.g. status change)
     const interval = setInterval(() => {
-        const current = db.getWorkloads().find(w => w.id === id);
-        setWorkload(prev => JSON.stringify(prev) !== JSON.stringify(current) ? current : prev);
+        try {
+          const workloads = db.getWorkloads();
+          if (!workloads) return;
+          const current = workloads.find(w => w.id === id);
+          setWorkload(prev => JSON.stringify(prev) !== JSON.stringify(current) ? current : prev);
+        } catch (error) {
+          console.error('Failed to refresh workload:', error);
+        }
     }, 1000);
     return () => clearInterval(interval);
   }, [id]);
@@ -44,14 +69,40 @@ export default function WorkloadDetailPage() {
      setMetricData(data);
   }, []);
 
-  const driftItem = MOCK_DRIFT_ITEMS.find(d => d.resourceName === workload?.name);
+  const driftItem = workload?.name ? MOCK_DRIFT_ITEMS?.find(d => d.resourceName === workload.name) : undefined;
+
+  // Show loading state
+  if (loading) {
+    return (
+        <MainLayout>
+            <div className="flex flex-col items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p className="text-slate-400 mt-4">워크로드 정보를 불러오는 중...</p>
+            </div>
+        </MainLayout>
+    );
+  }
+
+  // Show error for invalid ID
+  if (!id || typeof id !== 'string') {
+    return (
+        <MainLayout>
+            <div className="flex flex-col items-center justify-center h-full">
+                <h1 className="text-2xl font-bold text-red-400">잘못된 요청</h1>
+                <p className="text-slate-400 mt-2">유효하지 않은 워크로드 ID입니다.</p>
+                <Link href="/workloads" className="text-blue-500 hover:underline mt-4">워크로드 목록으로 돌아가기</Link>
+            </div>
+        </MainLayout>
+    );
+  }
 
   if (!workload) {
     return (
         <MainLayout>
             <div className="flex flex-col items-center justify-center h-full">
-                <h1 className="text-2xl font-bold">Workload Not Found</h1>
-                <Link href="/workloads" className="text-blue-500 hover:underline mt-4">Back to Workloads</Link>
+                <h1 className="text-2xl font-bold">워크로드를 찾을 수 없습니다</h1>
+                <p className="text-slate-400 mt-2">요청한 워크로드가 존재하지 않거나 삭제되었습니다.</p>
+                <Link href="/workloads" className="text-blue-500 hover:underline mt-4">워크로드 목록으로 돌아가기</Link>
             </div>
         </MainLayout>
     )
@@ -108,13 +159,13 @@ export default function WorkloadDetailPage() {
                 <TabsContent value="metrics" className="flex-1 overflow-y-auto mt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Card>
-                            <CardHeader className="pb-2"><CardTitle className="text-sm text-slate-400 flex items-center gap-2"><FiCpu /> CPU Cores</CardTitle></CardHeader>
+                            <CardHeader className="pb-2"><CardTitle className="text-sm text-slate-400 flex items-center gap-2"><FiCpu /> CPU 코어</CardTitle></CardHeader>
                             <CardContent>
                                 <MetricChart data={metricData} color="#f43f5e" unit="m" />
                             </CardContent>
                         </Card>
                         <Card>
-                            <CardHeader className="pb-2"><CardTitle className="text-sm text-slate-400 flex items-center gap-2"><FiHardDrive /> Memory (MiB)</CardTitle></CardHeader>
+                            <CardHeader className="pb-2"><CardTitle className="text-sm text-slate-400 flex items-center gap-2"><FiHardDrive /> 메모리 (MiB)</CardTitle></CardHeader>
                             <CardContent>
                                 <MetricChart data={metricData.map(d => ({...d, value: d.value * 2}))} color="#3b82f6" unit="Mi" />
                             </CardContent>

@@ -192,7 +192,7 @@ export function LoginForm() {
       </div>
 
       <div className="mt-6 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-        © 2025 Jacon Operations. All rights reserved.
+        © 2025 Jacon Operations. 모든 권리 보유.
       </div>
     </div>
   );

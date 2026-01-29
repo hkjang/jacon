@@ -49,7 +49,36 @@ export interface GitRepo {
   autoSync: boolean;
   createdAt: string;
 }
-  createdAt: string;
+
+export interface Endpoint {
+  id: string;
+  projectId: string;
+  name: string;
+  type: 'Kubernetes' | 'Docker' | 'Swarm';
+  status: 'Online' | 'Offline' | 'Degraded' | 'Warning';
+  url: string;
+  version: string;
+  tags: string[];
+  lastSeen: string;
+  isEdge: boolean;
+  connectionMode: 'direct' | 'agent';
+  groupId?: string;
+}
+
+export interface EndpointGroup {
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+}
+
+export interface Registry {
+  id: string;
+  name: string;
+  type: 'dockerhub' | 'acr' | 'ecr' | 'gcr' | 'other';
+  url: string;
+  username?: string;
+  associatedEndpoints: string[];
 }
 
 export interface Policy {
@@ -82,10 +111,7 @@ class MockDatabase {
   public sessions: Session[];
   public apiTokens: ApiToken[];
   public stacks: Stack[];
-  public stacks: Stack[];
   public gitRepos: GitRepo[];
-  public endpoints: Endpoint[];
-  public endpointGroups: EndpointGroup[];
   public endpoints: Endpoint[];
   public endpointGroups: EndpointGroup[];
   public registries: Registry[];
@@ -131,6 +157,42 @@ class MockDatabase {
             createdAt: new Date().toISOString()
         }
     ];
+    this.endpoints = [
+        {
+            id: 'ep-1',
+            projectId: 'default',
+            name: 'Production Cluster',
+            type: 'Kubernetes',
+            status: 'Online',
+            url: 'https://k8s.example.com',
+            version: 'v1.28.0',
+            tags: ['production'],
+            lastSeen: 'Just now',
+            isEdge: false,
+            connectionMode: 'direct'
+        },
+        {
+            id: 'ep-5',
+            projectId: 'default',
+            name: 'Edge Node 1',
+            type: 'Docker',
+            status: 'Online',
+            url: 'tcp://edge1.example.com:2375',
+            version: '24.0.0',
+            tags: ['edge'],
+            lastSeen: '5 minutes ago',
+            isEdge: true,
+            connectionMode: 'agent'
+        }
+    ];
+    this.endpointGroups = [
+        {
+            id: 'group-1',
+            name: 'Production',
+            description: 'Production environment endpoints',
+            tags: ['production']
+        }
+    ];
     this.registries = [
         { id: 'reg-1', name: 'Docker Hub', type: 'dockerhub', url: 'https://index.docker.io/v1/', associatedEndpoints: ['ep-1', 'ep-5'] }
     ];
@@ -161,9 +223,9 @@ class MockDatabase {
   }
 
   // --- Endpoint Operations ---
-  getEndpoints() { return this.endpoints; }
-  
-  getEdgeEndpoints() { return this.endpoints.filter(e => e.isEdge); }
+  getEndpoints() { return this.endpoints ?? []; }
+
+  getEdgeEndpoints() { return (this.endpoints ?? []).filter(e => e.isEdge); }
 
   addEndpoint(ep: Partial<Endpoint>) {
       const newEp: Endpoint = {
@@ -186,7 +248,7 @@ class MockDatabase {
   }
 
   // --- Endpoint Group Operations ---
-  getEndpointGroups() { return this.endpointGroups; }
+  getEndpointGroups() { return this.endpointGroups ?? []; }
 
   createEndpointGroup(group: Partial<EndpointGroup>) {
       const newGroup: EndpointGroup = {
@@ -200,7 +262,7 @@ class MockDatabase {
   }
 
   // --- Registry Operations ---
-  getRegistries() { return this.registries; }
+  getRegistries() { return this.registries ?? []; }
 
   addRegistry(reg: Partial<Registry>) {
       const newReg: Registry = {
@@ -214,12 +276,8 @@ class MockDatabase {
       return newReg;
   }
 
-      this.registries.push(newReg);
-      return newReg;
-  }
-
   // --- Policy Operations ---
-  getPolicies() { return this.policies; }
+  getPolicies() { return this.policies ?? []; }
   
   addPolicy(policy: Partial<Policy>) {
       const newPol: Policy = {
@@ -237,7 +295,8 @@ class MockDatabase {
   }
 
   updatePolicy(id: string, updates: Partial<Policy>) {
-      const pol = this.policies.find(p => p.id === id);
+      if (!id) return null;
+      const pol = this.policies?.find(p => p.id === id);
       if (pol) {
           Object.assign(pol, updates);
           return pol;
@@ -246,10 +305,10 @@ class MockDatabase {
   }
 
   // --- IAM Operations ---
-  getIamRoles() { return this.iamRoles; }
-  
+  getIamRoles() { return this.iamRoles ?? []; }
+
   // --- GitOps Operations ---
-  getGitRepos() { return this.gitRepos; }
+  getGitRepos() { return this.gitRepos ?? []; }
   
   addGitRepo(repo: Partial<GitRepo>) {
       const newRepo: GitRepo = {
@@ -269,7 +328,8 @@ class MockDatabase {
   }
 
   removeGitRepo(id: string) {
-      const idx = this.gitRepos.findIndex(r => r.id === id);
+      if (!id) return false;
+      const idx = this.gitRepos?.findIndex(r => r.id === id) ?? -1;
       if (idx !== -1) {
           const removed = this.gitRepos[idx];
           this.gitRepos.splice(idx, 1);
@@ -280,17 +340,23 @@ class MockDatabase {
   }
 
   updateGitRepoStatus(id: string, status: GitRepo['status'], lastSync?: string) {
-      const repo = this.gitRepos.find(r => r.id === id);
+      if (!id) return false;
+      const repo = this.gitRepos?.find(r => r.id === id);
       if (repo) {
           repo.status = status;
           if (lastSync) repo.lastSync = lastSync;
+          return true;
       }
+      return false;
   }
 
   // --- Stack Operations ---
-  getStacks() { return this.stacks; }
-  
-  getStack(id: string) { return this.stacks.find(s => s.id === id); }
+  getStacks() { return this.stacks ?? []; }
+
+  getStack(id: string) {
+    if (!id) return undefined;
+    return this.stacks?.find(s => s.id === id);
+  }
   
   createStack(stack: Partial<Stack>) {
       const newStack: Stack = {
@@ -332,7 +398,8 @@ class MockDatabase {
   }
 
   deleteStack(id: string) {
-      const idx = this.stacks.findIndex(s => s.id === id);
+      if (!id) return false;
+      const idx = this.stacks?.findIndex(s => s.id === id) ?? -1;
       if (idx !== -1) {
           const removed = this.stacks[idx];
           this.stacks.splice(idx, 1);
@@ -384,26 +451,33 @@ class MockDatabase {
 
   // --- User Auth Operations ---
   findUserByEmail(email: string) {
-      return this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!email) return undefined;
+      return this.users?.find(u => u.email.toLowerCase() === email.toLowerCase());
   }
 
   incrementFailedLogin(userId: string) {
-      const user = this.users.find(u => u.id === userId);
+      if (!userId) return false;
+      const user = this.users?.find(u => u.id === userId);
       if (user) {
           user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
           if (user.failedLoginAttempts >= 5) {
               user.lockUntil = Date.now() + (15 * 60 * 1000); // 15 min lock
               this.addAuditLog(user.email, 'Security', 'User/Lockout', 'Account locked due to excessive failed attempts', 'High', 'System');
           }
+          return true;
       }
+      return false;
   }
 
   resetFailedLogin(userId: string) {
-      const user = this.users.find(u => u.id === userId);
+      if (!userId) return false;
+      const user = this.users?.find(u => u.id === userId);
       if (user) {
           user.failedLoginAttempts = 0;
           user.lockUntil = undefined;
+          return true;
       }
+      return false;
   }
 
   // --- API Token Operations ---
@@ -438,12 +512,13 @@ class MockDatabase {
   }
 
   // --- User Operations ---
-  getUsers() { return this.users; }
-  
-  getAdminUsers() { return this.adminUsers; }
+  getUsers() { return this.users ?? []; }
+
+  getAdminUsers() { return this.adminUsers ?? []; }
   
   updateAdminUserStatus(id: string, status: 'Active' | 'Locked' | 'Pending') {
-    const user = this.adminUsers.find(u => u.id === id);
+    if (!id) return false;
+    const user = this.adminUsers?.find(u => u.id === id);
     if (user) {
       user.status = status;
       this.addAuditLog('System', 'Update', `User/${user.name}`, `Changed status to ${status}`, 'Info', 'System');
@@ -453,7 +528,8 @@ class MockDatabase {
   }
 
   deleteAdminUser(id: string) {
-    const idx = this.adminUsers.findIndex(u => u.id === id);
+    if (!id) return false;
+    const idx = this.adminUsers?.findIndex(u => u.id === id) ?? -1;
     if (idx !== -1) {
       const removed = this.adminUsers[idx];
       this.adminUsers.splice(idx, 1);
@@ -479,10 +555,11 @@ class MockDatabase {
   }
 
   // --- Settings Operations ---
-  getSettings() { return this.settings; }
-  
+  getSettings() { return this.settings ?? []; }
+
   updateSetting(key: string, value: any) {
-    const setting = this.settings.find(s => s.key === key);
+    if (!key) return false;
+    const setting = this.settings?.find(s => s.key === key);
     if (setting) {
       const oldValue = setting.value;
       setting.value = value;
@@ -494,9 +571,12 @@ class MockDatabase {
 
 
   // --- Workload Operations ---
-  getWorkloads() { return this.workloads; }
-  
-  getWorkload(id: string) { return this.workloads.find(w => w.id === id); }
+  getWorkloads() { return this.workloads ?? []; }
+
+  getWorkload(id: string) {
+    if (!id) return undefined;
+    return this.workloads?.find(w => w.id === id);
+  }
 
   addWorkload(workload: Partial<Workload>) {
       const newWorkload: Workload = {
@@ -518,7 +598,8 @@ class MockDatabase {
   }
 
   updateWorkloadStatus(id: string, status: any) {
-      const w = this.workloads.find(w => w.id === id);
+      if (!id) return null;
+      const w = this.workloads?.find(w => w.id === id);
       if (w) {
           w.status = status;
           if (status === 'Running' && w.status !== 'Running') {
@@ -533,7 +614,7 @@ class MockDatabase {
   }
 
   // --- Audit Operations ---
-  getAuditLogs() { return this.auditLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); }
+  getAuditLogs() { return (this.auditLogs ?? []).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); }
 
   addAuditLog(user: string, action: string, resource: string, details: string, severity: 'Info' | 'High' | 'Critical' | 'Warning' = 'Info', ip: string = '127.0.0.1') {
     const newLog: AuditLog = {

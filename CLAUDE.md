@@ -9,6 +9,7 @@ Unified Docker & Kubernetes Management platform built with Next.js.
 - **React**: 19.2.3 with React Compiler (babel-plugin-react-compiler)
 - **Styling**: Tailwind CSS 3.4 + CSS Modules
 - **Utilities**: clsx for class name composition
+- **Default Language**: Korean (한국어) - All UI text and labels should be in Korean
 
 ## Project Structure
 

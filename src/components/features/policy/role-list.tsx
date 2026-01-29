@@ -80,7 +80,7 @@ export function RoleList() {
                   <thead className="text-xs uppercase bg-slate-800 text-slate-400">
                      <tr>
                         <th className="px-6 py-3">리소스</th>
-                        <th className="px-6 py-3">작업 (Verbs)</th>
+                        <th className="px-6 py-3">작업</th>
                      </tr>
                   </thead>
                   <tbody>

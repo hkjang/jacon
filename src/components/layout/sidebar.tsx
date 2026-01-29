@@ -63,7 +63,7 @@ export function Sidebar() {
 
 
       <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-3">
-        Edge Compute
+        에지 컴퓨트
       </h3>
       <nav className="space-y-1">
         <NavItem href="/edge" icon={FiActivity} label="에지 대시보드" currentPath={pathname} />
@@ -71,7 +71,7 @@ export function Sidebar() {
       </nav>
 
       <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-3">
-        Multi-cluster
+        멀티 클러스터
       </h3>
       <nav className="space-y-1">
         <NavItem href="/multi-cluster/overview" icon={FiGlobe} label="개요" currentPath={pathname} />
@@ -81,6 +81,7 @@ export function Sidebar() {
       <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-3">
         설정
       </h3>
+      <nav className="space-y-1">
         <NavItem href="/settings/registries" icon={FiSettings} label="레지스트리" currentPath={pathname} />
         <NavItem href="/settings/policy" icon={FiShield} label="정책 (OPA)" currentPath={pathname} />
         <NavItem href="/settings/iam" icon={FiUsers} label="IAM 및 권한" currentPath={pathname} />

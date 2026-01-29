@@ -13,11 +13,11 @@ export default function IamPage() {
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
             <div>
-                <h1 className="text-2xl font-bold">Identity & Access Management (IAM)</h1>
+                <h1 className="text-2xl font-bold">ID 및 접근 관리 (IAM)</h1>
                 <p className="text-slate-400">역할 기반 접근 제어(RBAC)를 관리합니다.</p>
             </div>
             <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
-                <FiPlus /> Create Role
+                <FiPlus /> 역할 생성
             </Button>
         </div>
 
@@ -31,14 +31,14 @@ export default function IamPage() {
                                 {role.name}
                             </CardTitle>
                             {role.type === 'system' && (
-                                <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase font-bold">System</span>
+                                <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase font-bold">시스템</span>
                             )}
                         </div>
                         <CardDescription>{role.description}</CardDescription>
                      </CardHeader>
                      <CardContent>
                         <div className="mb-4">
-                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Permissions</div>
+                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">권한</div>
                             <div className="flex flex-wrap gap-1">
                                 {role.permissions.map(perm => (
                                     <span key={perm} className="text-xs px-2 py-1 bg-slate-900 rounded text-slate-300 font-mono border border-slate-800">
@@ -49,7 +49,7 @@ export default function IamPage() {
                         </div>
                         <div className="flex gap-2">
                              <Button variant="outline" size="sm" className="w-full" disabled={role.type === 'system'}>
-                                <FiEdit className="mr-2" /> Edit
+                                <FiEdit className="mr-2" /> 편집
                              </Button>
                              {role.type !== 'system' && (
                                 <Button variant="ghost" size="sm" className="text-red-400 hover:bg-red-500/10">
@@ -65,7 +65,7 @@ export default function IamPage() {
         <Card className="mt-4 border-dashed border-2 bg-slate-900/30">
             <CardContent className="py-8 text-center text-slate-500">
                 <FiUsers size={32} className="mx-auto mb-2 opacity-50" />
-                <p>User assignment to roles is managed in the <span className="text-blue-400 underline cursor-pointer">Users & Teams</span> section.</p>
+                <p>역할에 대한 사용자 할당은 <span className="text-blue-400 underline cursor-pointer">사용자 및 팀</span> 섹션에서 관리됩니다.</p>
             </CardContent>
         </Card>
       </div>

@@ -34,14 +34,14 @@ export function ProtectedActionModal({
   const getMockImpact = (type: string, _name: string) => {
     if (type === 'delete') {
        return [
-         `Dependent Service 'api-gateway' will lose connectivity`,
-         `3 active persistent volumes will be detached`,
-         `Audit log will mark this as a CRITICAL event`
+         `종속 서비스 'api-gateway'의 연결이 끊어집니다`,
+         `3개의 활성 영구 볼륨이 분리됩니다`,
+         `감사 로그에 심각한 이벤트로 기록됩니다`
        ];
     }
     return [
-       `Service unavailable for approx 30-60 seconds`,
-       `Active connections (45) will be dropped`
+       `약 30-60초 동안 서비스를 사용할 수 없습니다`,
+       `활성 연결 (45개)이 끊어집니다`
     ];
   };
 
@@ -96,11 +96,11 @@ export function ProtectedActionModal({
            {/* Impact Analysis */}
            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-800">
               <h4 className="text-xs font-bold uppercase text-slate-500 mb-3 flex items-center gap-2">
-                 <FiAlertCircle /> Impact Analysis
+                 <FiAlertCircle /> 영향 분석
               </h4>
               <div className="space-y-2">
                  {analyzing ? (
-                    <div className="text-sm text-slate-500 italic">Analyzing dependencies...</div>
+                    <div className="text-sm text-slate-500 italic">종속성 분석 중...</div>
                  ) : (
                     impactAnalysis.map((item, i) => (
                        <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
@@ -115,7 +115,7 @@ export function ProtectedActionModal({
            {/* Confirmation Input */}
            <div className="space-y-3">
               <label className="text-sm font-medium text-slate-300 block">
-                 Type <strong>{resourceName}</strong> to confirm:
+                 확인하려면 <strong>{resourceName}</strong>을(를) 입력하세요:
               </label>
               <Input 
                  value={confirmInput}
@@ -133,9 +133,9 @@ export function ProtectedActionModal({
         {/* Footer */}
         <div className="p-6 border-t border-slate-800 bg-slate-900/30 flex justify-end gap-3 rounded-b-lg">
            <Button variant="ghost" onClick={onClose} className="hover:bg-slate-800">
-              Cancel
+              취소
            </Button>
-           <Button 
+           <Button
               variant={actionType === 'delete' ? 'danger' : 'primary'} // Assuming destructive variant exists or fallback
               className={cn(
                  actionType === 'delete' ? "bg-red-600 hover:bg-red-700" : "bg-amber-600 hover:bg-amber-700",
@@ -144,7 +144,7 @@ export function ProtectedActionModal({
               disabled={!isConfirmed}
               onClick={onConfirm}
            >
-              {actionType === 'delete' ? 'Delete Resource' : 'Execute Action'}
+              {actionType === 'delete' ? '리소스 삭제' : '작업 실행'}
            </Button>
         </div>
       </div>

@@ -48,7 +48,7 @@ export default function EndpointGroupsPage() {
                             
                             <div className="bg-slate-900 rounded-lg p-3">
                                 <div className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">
-                                    Assigned Endpoints ({groupEndpoints.length})
+                                    할당된 엔드포인트 ({groupEndpoints.length})
                                 </div>
                                 {groupEndpoints.length > 0 ? (
                                     <ul className="space-y-2">
@@ -60,7 +60,7 @@ export default function EndpointGroupsPage() {
                                         ))}
                                     </ul>
                                 ) : (
-                                    <div className="text-xs text-slate-600 italic">No endpoints assigned.</div>
+                                    <div className="text-xs text-slate-600 italic">할당된 엔드포인트가 없습니다.</div>
                                 )}
                             </div>
                         </CardContent>

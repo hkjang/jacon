@@ -21,10 +21,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for existing session (mock implementation using localStorage)
-    const storedUser = localStorage.getItem('jacon_user');
-    if (storedUser) {
-      // eslint-disable-next-line
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedUser = localStorage.getItem('jacon_user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser && typeof parsedUser === 'object' && parsedUser.id) {
+          setUser(parsedUser);
+        } else {
+          // Invalid user data, clear it
+          localStorage.removeItem('jacon_user');
+          localStorage.removeItem('jacon_token');
+        }
+      }
+    } catch {
+      // Corrupted localStorage data, clear it
+      console.error('Failed to parse stored user data');
+      localStorage.removeItem('jacon_user');
+      localStorage.removeItem('jacon_token');
     }
     setLoading(false);
   }, []);

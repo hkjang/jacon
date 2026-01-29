@@ -4,8 +4,8 @@ import { ProjectProvider } from "@/hooks/use-project-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Jacon - Operations",
-  description: "Unified Docker & Kubernetes Management",
+  title: "Jacon - 운영 플랫폼",
+  description: "Docker & Kubernetes 통합 관리 플랫폼",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>
         <AuthProvider>
           <ProjectProvider>

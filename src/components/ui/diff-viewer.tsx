@@ -20,10 +20,10 @@ export function DiffViewer({ oldValue, newValue }: DiffViewerProps) {
   return (
     <div className="font-mono text-xs border border-slate-800 rounded-md overflow-hidden bg-slate-950">
        <div className="flex bg-slate-900 border-b border-slate-800 p-2 justify-between items-center text-slate-400">
-          <span>Changes Preview</span>
+          <span>변경사항 미리보기</span>
           <div className="flex gap-2 text-[10px] uppercase font-bold">
-             <span className="flex items-center gap-1 text-red-400"><span className="w-2 h-2 rounded-full bg-red-400/20 block ring-1 ring-red-500/50" /> Removed</span>
-             <span className="flex items-center gap-1 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400/20 block ring-1 ring-emerald-500/50" /> Added</span>
+             <span className="flex items-center gap-1 text-red-400"><span className="w-2 h-2 rounded-full bg-red-400/20 block ring-1 ring-red-500/50" /> 삭제됨</span>
+             <span className="flex items-center gap-1 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400/20 block ring-1 ring-emerald-500/50" /> 추가됨</span>
           </div>
        </div>
        

@@ -27,13 +27,13 @@ export default function ObservabilityPage() {
        <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
-                <h1 className="text-2xl font-bold">System Observability</h1>
+                <h1 className="text-2xl font-bold">시스템 관측성</h1>
                 <p className="text-slate-400">전체 클러스터 및 워크로드의 상태를 모니터링합니다.</p>
             </div>
             <div className="flex gap-2">
                 <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded text-sm border border-emerald-500/20 flex items-center gap-2">
                     <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    System Healthy
+                    시스템 정상
                 </span>
             </div>
           </div>
@@ -42,26 +42,26 @@ export default function ObservabilityPage() {
              <Card>
                  <CardHeader className="flex flex-row items-center justify-between pb-2">
                      <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                         <FiCpu /> Cluster CPU Usage
+                         <FiCpu /> 클러스터 CPU 사용량
                      </CardTitle>
                  </CardHeader>
                  <CardContent>
-                     <MetricChart data={cpuData} color="#f43f5e" label="Total Cores Utilized" unit="%" />
+                     <MetricChart data={cpuData} color="#f43f5e" label="총 코어 사용량" unit="%" />
                  </CardContent>
              </Card>
              <Card>
                  <CardHeader className="flex flex-row items-center justify-between pb-2">
                      <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                         <FiHardDrive /> Memory Usage
+                         <FiHardDrive /> 메모리 사용량
                      </CardTitle>
                  </CardHeader>
                  <CardContent>
-                     <MetricChart data={memData} color="#3b82f6" label="Total RAM Utilized" unit="%" />
+                     <MetricChart data={memData} color="#3b82f6" label="총 RAM 사용량" unit="%" />
                  </CardContent>
              </Card>
           </div>
 
-          <h2 className="text-lg font-semibold mt-4">Node Status</h2>
+          <h2 className="text-lg font-semibold mt-4">노드 상태</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {['jacon-worker-1', 'jacon-worker-2', 'jacon-worker-3'].map(node => (
                   <Card key={node} className="bg-slate-900 border-slate-800">
@@ -71,10 +71,10 @@ export default function ObservabilityPage() {
                           </div>
                           <div>
                               <div className="font-bold text-slate-200">{node}</div>
-                              <div className="text-xs text-slate-500">Ready • v1.28.2</div>
+                              <div className="text-xs text-slate-500">준비됨 • v1.28.2</div>
                           </div>
                           <div className="ml-auto text-emerald-500 text-sm font-bold">
-                              OK
+                              정상
                           </div>
                       </CardContent>
                   </Card>

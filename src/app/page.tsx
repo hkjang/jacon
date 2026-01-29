@@ -6,19 +6,19 @@ export default function Home() {
           Jacon
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.25rem', marginBottom: '2rem' }}>
-          Unified Operations for Docker & Kubernetes
+          Docker & Kubernetes 통합 운영 플랫폼
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <button style={{ 
-            padding: '0.75rem 1.5rem', 
-            borderRadius: 'var(--radius-md)', 
-            backgroundColor: 'var(--accent-primary)', 
-            color: 'white', 
-            border: 'none', 
-            fontSize: '1rem', 
-            cursor: 'pointer' 
+          <button style={{
+            padding: '0.75rem 1.5rem',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--accent-primary)',
+            color: 'white',
+            border: 'none',
+            fontSize: '1rem',
+            cursor: 'pointer'
           }}>
-            Get Started
+            시작하기
           </button>
         </div>
       </main>

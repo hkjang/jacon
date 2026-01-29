@@ -8,12 +8,28 @@ import { FiArrowLeft, FiBox, FiTrash2, FiPlay, FiStopCircle, FiRefreshCw } from 
 import Link from 'next/link';
 import { deleteStackAction } from '@/lib/stack-actions';
 
+import { notFound } from 'next/navigation';
+
 export default async function StackDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  let id: string;
+
+  try {
+    const resolvedParams = await params;
+    id = resolvedParams?.id;
+  } catch {
+    redirect('/stacks');
+    return null;
+  }
+
+  // Validate ID parameter
+  if (!id || typeof id !== 'string') {
+    notFound();
+  }
+
   const stack = db.getStack(id);
 
   if (!stack) {
-      redirect('/stacks');
+    notFound();
   }
 
   return (

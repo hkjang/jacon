@@ -11,13 +11,31 @@ import Link from 'next/link';
 
 export default function ConfigDetailPage() {
   const params = useParams();
-  const id = params.id as string;
-  const config = MOCK_CONFIGS.find(c => c.id === id);
+  const id = params?.id as string;
+
+  // Validate ID parameter
+  if (!id || typeof id !== 'string') {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center h-full">
+          <h1 className="text-2xl font-bold text-red-400">잘못된 요청</h1>
+          <p className="text-slate-400 mt-2">유효하지 않은 Config ID입니다.</p>
+          <Link href="/config" className="text-blue-500 hover:underline mt-4">Config 목록으로 돌아가기</Link>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  const config = MOCK_CONFIGS?.find(c => c.id === id);
 
   if (!config) {
      return (
         <MainLayout>
-           <div className="text-center mt-10">Config not found</div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <h1 className="text-2xl font-bold">Config를 찾을 수 없습니다</h1>
+            <p className="text-slate-400 mt-2">요청한 Config가 존재하지 않거나 삭제되었습니다.</p>
+            <Link href="/config" className="text-blue-500 hover:underline mt-4">Config 목록으로 돌아가기</Link>
+          </div>
         </MainLayout>
      )
   }

@@ -101,7 +101,7 @@ function GeneralTab({ user, isSso }: { user: User; isSso: boolean }) {
               <div className="space-y-2">
                  <label className="text-xs font-bold text-slate-500 uppercase">직책</label>
                  <div className="p-3 bg-slate-900 border border-slate-800 rounded text-slate-300">
-                    {user.title || 'N/A'}
+                    {user.title || '없음'}
                  </div>
               </div>
            </div>
@@ -161,8 +161,8 @@ function SessionsTab({ sessions }: { sessions: Session[] }) {
                                     </div>
                                     <div>
                                         <div className="font-medium text-slate-200">
-                                            {session.userAgent.includes('Windows') ? 'Windows PC' : 
-                                             session.userAgent.includes('Mac') ? 'Mac' : 'Browser Session'}
+                                            {session.userAgent.includes('Windows') ? 'Windows PC' :
+                                             session.userAgent.includes('Mac') ? 'Mac' : '브라우저 세션'}
                                         </div>
                                         <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
                                             <span>IP: {session.ip}</span>
@@ -175,7 +175,7 @@ function SessionsTab({ sessions }: { sessions: Session[] }) {
                                 <div className="flex items-center gap-2">
                                     {session.expiresAt && (
                                         <span className="px-2 py-1 rounded text-xs bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                            Current
+                                            현재
                                         </span>
                                     )}
                                     <Button variant="ghost" size="sm" className="text-red-400 hover:bg-red-500/10">
@@ -256,17 +256,17 @@ function SettingsTab() {
                 <CardContent className="space-y-4">
                     <div className="grid gap-4">
                          <div className="flex items-center justify-between p-2">
-                             <span className="text-sm text-slate-300">언어 (Language)</span>
+                             <span className="text-sm text-slate-300">언어</span>
                              <select className="bg-slate-900 border border-slate-700 rounded p-1 text-sm text-slate-300">
                                  <option>한국어</option>
                                  <option>English</option>
                              </select>
                          </div>
                          <div className="flex items-center justify-between p-2">
-                             <span className="text-sm text-slate-300">테마 (Theme)</span>
+                             <span className="text-sm text-slate-300">테마</span>
                              <select className="bg-slate-900 border border-slate-700 rounded p-1 text-sm text-slate-300">
-                                 <option>Dark (Default)</option>
-                                 <option>Light</option>
+                                 <option>다크 (기본)</option>
+                                 <option>라이트</option>
                              </select>
                          </div>
                     </div>

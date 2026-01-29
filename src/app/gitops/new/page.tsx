@@ -84,11 +84,11 @@ export default function NewGitRepoPage() {
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">Username</label>
+                            <label className="text-sm font-medium text-slate-300">사용자명</label>
                             <Input name="username" placeholder="git-user" />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">Personal Access Token</label>
+                            <label className="text-sm font-medium text-slate-300">개인 액세스 토큰</label>
                             <Input type="password" name="token" placeholder="ghp_xxxxxxxxxxxx" />
                         </div>
                     </div>

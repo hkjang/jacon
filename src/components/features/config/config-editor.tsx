@@ -8,15 +8,27 @@ import { FiSave, FiCopy, FiEye, FiEyeOff } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 
 export function ConfigEditor({ configId }: { configId: string }) {
-  const config = MOCK_CONFIGS.find(c => c.id === configId);
-  const [activeKey, setActiveKey] = useState<string>(config?.keys[0] || '');
+  // Safely find config with null checks
+  const config = configId ? MOCK_CONFIGS?.find(c => c.id === configId) : undefined;
+  const [activeKey, setActiveKey] = useState<string>('');
   const [showSecret, setShowSecret] = useState(false);
 
-  if (!config) {
-    return <div className="text-center text-slate-500 mt-10">Configuration not found</div>;
+  // Set initial active key when config loads
+  React.useEffect(() => {
+    if (config?.keys?.length) {
+      setActiveKey(config.keys[0]);
+    }
+  }, [config]);
+
+  if (!configId) {
+    return <div className="text-center text-red-400 mt-10">구성 ID가 제공되지 않았습니다</div>;
   }
 
-  const content = config.data[activeKey] || '';
+  if (!config) {
+    return <div className="text-center text-slate-500 mt-10">구성을 찾을 수 없습니다</div>;
+  }
+
+  const content = activeKey && config.data ? (config.data[activeKey] ?? '') : '';
   const isSecret = config.type === 'Secret';
 
   return (
@@ -24,7 +36,7 @@ export function ConfigEditor({ configId }: { configId: string }) {
       {/* Sidebar: Keys */}
       <Card className="w-1/4 min-w-[200px]">
         <CardHeader>
-          <CardTitle className="text-sm uppercase text-slate-400">Keys</CardTitle>
+          <CardTitle className="text-sm uppercase text-slate-400">키</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="flex flex-col">
@@ -52,14 +64,14 @@ export function ConfigEditor({ configId }: { configId: string }) {
             {isSecret && (
               <Button variant="ghost" size="sm" onClick={() => setShowSecret(!showSecret)}>
                 {showSecret ? <FiEyeOff className="mr-2" /> : <FiEye className="mr-2" />}
-                {showSecret ? 'Hide' : 'Reveal'}
+                {showSecret ? '숨기기' : '표시'}
               </Button>
             )}
             <Button variant="ghost" size="sm">
               <FiCopy />
             </Button>
             <Button size="sm">
-              <FiSave className="mr-2" /> Save
+              <FiSave className="mr-2" /> 저장
             </Button>
           </div>
         </div>

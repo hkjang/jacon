@@ -16,6 +16,7 @@ export function WorkloadList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [workloads, setWorkloads] = useState(MOCK_WORKLOADS); // Init with default
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Initial load
   React.useEffect(() => {
@@ -24,10 +25,24 @@ export function WorkloadList() {
 
   const loadWorkloads = () => {
       setRefreshing(true);
+      setError(null);
       // Simulate network delay
       setTimeout(() => {
-          setWorkloads([...db.getWorkloads()]);
-          setRefreshing(false);
+          try {
+              const data = db.getWorkloads();
+              if (!data || !Array.isArray(data)) {
+                  setError('워크로드 데이터를 불러올 수 없습니다.');
+                  setWorkloads([]);
+              } else {
+                  setWorkloads([...data]);
+              }
+          } catch (err) {
+              console.error('Failed to load workloads:', err);
+              setError('워크로드를 불러오는 중 오류가 발생했습니다.');
+              setWorkloads([]);
+          } finally {
+              setRefreshing(false);
+          }
       }, 500);
   };
 
@@ -45,13 +60,24 @@ export function WorkloadList() {
       }
   };
 
-  const filteredWorkloads = workloads.filter(w => 
-    w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    w.namespace.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredWorkloads = (workloads ?? []).filter(w =>
+    w?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    w?.namespace?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400 text-sm">
+          {error}
+          <button
+            onClick={loadWorkloads}
+            className="ml-2 underline hover:no-underline"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <div className="flex gap-2 w-full max-w-md">
           <Input 

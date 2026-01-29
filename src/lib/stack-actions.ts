@@ -5,32 +5,65 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function createStackAction(prevState: any, formData: FormData) {
-  const name = formData.get('name') as string;
-  const type = formData.get('type') as 'compose' | 'kubernetes';
-  const endpointId = formData.get('endpointId') as string;
-  const content = formData.get('content') as string;
+  try {
+    const name = formData.get('name') as string;
+    const type = formData.get('type') as 'compose' | 'kubernetes';
+    const endpointId = formData.get('endpointId') as string;
+    const content = formData.get('content') as string;
 
-  // Simulate validation
-  if (!name || !content) {
-    return { error: 'Name and Content are required.' };
+    // Validate required fields
+    if (!name || !name.trim()) {
+      return { error: '스택 이름을 입력해주세요.' };
+    }
+
+    if (!content || !content.trim()) {
+      return { error: '스택 콘텐츠를 입력해주세요.' };
+    }
+
+    if (!type || !['compose', 'kubernetes'].includes(type)) {
+      return { error: '올바른 스택 타입을 선택해주세요.' };
+    }
+
+    // Create in DB
+    const newStack = db.createStack({
+        name: name.trim(),
+        type,
+        endpointId: endpointId || '',
+        content,
+        envVars: {} // TODO: Parse env vars from form if needed
+    });
+
+    if (!newStack) {
+      return { error: '스택 생성에 실패했습니다.' };
+    }
+
+    revalidatePath('/stacks');
+  } catch (error) {
+    console.error('Create stack error:', error);
+    return { error: '스택 생성 중 오류가 발생했습니다.' };
   }
-
-  // Create in DB
-  const newStack = db.createStack({
-      name,
-      type,
-      endpointId,
-      content,
-      envVars: {} // TODO: Parse env vars from form if needed
-  });
-
-  revalidatePath('/stacks');
   redirect('/stacks');
 }
 
 export async function deleteStackAction(formData: FormData) {
+  try {
     const id = formData.get('id') as string;
+
+    if (!id) {
+      return { error: '삭제할 스택 ID가 필요합니다.' };
+    }
+
+    // Check if stack exists before deleting
+    const stack = db.getStack(id);
+    if (!stack) {
+      return { error: '스택을 찾을 수 없습니다.' };
+    }
+
     db.deleteStack(id);
     revalidatePath('/stacks');
-    redirect('/stacks');
+  } catch (error) {
+    console.error('Delete stack error:', error);
+    return { error: '스택 삭제 중 오류가 발생했습니다.' };
+  }
+  redirect('/stacks');
 }

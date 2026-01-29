@@ -42,13 +42,13 @@ export default function RegistriesPage() {
                                 <h3 className="text-lg font-bold text-slate-200">{reg.name}</h3>
                                 <div className="text-sm text-slate-500 flex items-center gap-2">
                                     <span className="font-mono bg-slate-900 px-1 rounded">{reg.url}</span>
-                                    {reg.username && <span>• User: {reg.username}</span>}
+                                    {reg.username && <span>• 사용자: {reg.username}</span>}
                                 </div>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
                              <div className="text-xs text-slate-500 mr-4">
-                                Used by {reg.associatedEndpoints.length} endpoints
+                                {reg.associatedEndpoints.length}개 엔드포인트에서 사용 중
                              </div>
                              <Button variant="ghost" size="sm"><FiExternalLink /></Button>
                              <Button variant="ghost" size="sm" className="text-slate-500 hover:text-red-400"><FiTrash2 /></Button>

@@ -69,10 +69,10 @@ export function LogViewer({ initialLogs = [], stream = true }: { initialLogs?: L
                 className={isPlaying ? "text-amber-400 hover:text-amber-300" : "text-emerald-400 hover:text-emerald-300"}
                 onClick={() => setIsPlaying(!isPlaying)}
             >
-                {isPlaying ? <><FiPause className="mr-1" /> Pause</> : <><FiPlay className="mr-1" /> Live</>}
+                {isPlaying ? <><FiPause className="mr-1" /> 일시정지</> : <><FiPlay className="mr-1" /> 실시간</>}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setLogs([])}>
-                <FiTrash2 /> Clear
+                <FiTrash2 /> 지우기
             </Button>
          </div>
          <div className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export function LogViewer({ initialLogs = [], stream = true }: { initialLogs?: L
                 <FiSearch className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500" />
                 <Input 
                     className="h-7 pl-8 bg-slate-800 border-slate-700 w-48 text-xs" 
-                    placeholder="Filter logs..." 
+                    placeholder="로그 필터링..." 
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                 />
@@ -103,7 +103,7 @@ export function LogViewer({ initialLogs = [], stream = true }: { initialLogs?: L
                   <span className="break-all">{log.message}</span>
               </div>
           ))}
-          {filteredLogs.length === 0 && <div className="text-slate-500 italic text-center mt-10">No logs found.</div>}
+          {filteredLogs.length === 0 && <div className="text-slate-500 italic text-center mt-10">로그가 없습니다.</div>}
           <div ref={logsEndRef} />
       </div>
     </div>

@@ -17,39 +17,74 @@ export default function DashboardPage() {
       healthScore: 100,
       workloadChange: '+2'
   });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
       calculateStats();
   }, []);
 
   const calculateStats = () => {
-      const workloads = db.getWorkloads();
-      
-      // Clusters
-      const clusters = new Set(workloads.map(w => w.cluster)).size;
-      
-      // Active Workloads
-      const active = workloads.filter(w => w.status === 'Running').length;
-      
-      // Health Score (mock calculation: 100 - (failed/total * 100))
-      const failed = workloads.filter(w => w.status === 'Failed' || w.status === 'CrashLoopBackOff').length;
-      const total = workloads.length || 1;
-      const health = Math.round(100 - ((failed / total) * 50)); // Penalty for failures
+      try {
+          const workloads = db.getWorkloads();
 
-      setStats({
-          totalClusters: clusters + 1, // +1 for Docker
-          activeWorkloads: active,
-          healthScore: health,
-          workloadChange: '0' // Static for now as we don't track history deeply
-      });
+          // Safety check for workloads array
+          if (!workloads || !Array.isArray(workloads)) {
+              setError('워크로드 데이터를 불러올 수 없습니다.');
+              return;
+          }
+
+          // Clusters
+          const clusters = new Set(workloads.map(w => w?.cluster).filter(Boolean)).size;
+
+          // Active Workloads
+          const active = workloads.filter(w => w?.status === 'Running').length;
+
+          // Health Score (mock calculation: 100 - (failed/total * 100))
+          const failed = workloads.filter(w => w?.status === 'Failed' || w?.status === 'CrashLoopBackOff').length;
+          const total = workloads.length || 1;
+          const health = Math.round(100 - ((failed / total) * 50)); // Penalty for failures
+
+          setStats({
+              totalClusters: clusters + 1, // +1 for Docker
+              activeWorkloads: active,
+              healthScore: health,
+              workloadChange: '0' // Static for now as we don't track history deeply
+          });
+          setError(null);
+      } catch (err) {
+          console.error('Failed to calculate stats:', err);
+          setError('대시보드 통계를 계산하는 중 오류가 발생했습니다.');
+      }
   };
+
+  // Get total workloads count safely
+  const totalWorkloads = React.useMemo(() => {
+      try {
+          const workloads = db.getWorkloads();
+          return workloads?.length ?? 0;
+      } catch {
+          return 0;
+      }
+  }, [stats]);
 
   return (
     <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
       <div>
-        <h1 className="text-2xl font-bold mb-2">My Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-2">내 대시보드</h1>
         <p className="text-slate-400">Docker 및 Kubernetes 리소스 현황 개요</p>
       </div>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400 text-sm">
+          {error}
+          <button
+            onClick={calculateStats}
+            className="ml-2 underline hover:no-underline"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
 
       {/* Top Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -90,7 +125,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-blue-500">{stats.activeWorkloads}</p>
-            <p className="text-xs text-slate-500 mt-1">총 {db.getWorkloads().length}개 워크로드 정의됨</p>
+            <p className="text-xs text-slate-500 mt-1">총 {totalWorkloads}개 워크로드 정의됨</p>
           </CardContent>
         </Card>
       </div>

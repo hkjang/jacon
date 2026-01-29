@@ -16,34 +16,34 @@ export function WorkloadOverview({ workload }: { workload: Workload }) {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-            <FiActivity /> Uptime & Restarts
+            <FiActivity /> 가동 시간 및 재시작
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{workload.age}</div>
-          <div className="text-sm text-slate-500 mt-1">{workload.restarts} restarts</div>
+          <div className="text-sm text-slate-500 mt-1">{workload.restarts}회 재시작</div>
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-            <FiCpu /> CPU Usage (Est)
+            <FiCpu /> CPU 사용량 (추정)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">128m</div>
-          <div className="text-sm text-slate-500 mt-1">Limit: 500m</div>
+          <div className="text-sm text-slate-500 mt-1">제한: 500m</div>
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
-             Memory Usage (Est)
+             메모리 사용량 (추정)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">256Mi</div>
-          <div className="text-sm text-slate-500 mt-1">Limit: 1Gi</div>
+          <div className="text-sm text-slate-500 mt-1">제한: 1Gi</div>
         </CardContent>
       </Card>
     </div>

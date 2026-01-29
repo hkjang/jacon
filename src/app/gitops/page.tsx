@@ -15,7 +15,7 @@ export default function GitOpsPage() {
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
             <div>
-                <h1 className="text-2xl font-bold">GitOps Integration</h1>
+                <h1 className="text-2xl font-bold">GitOps 연동</h1>
                 <p className="text-slate-400">Git 리포지토리를 연결하여 애플리케이션 상태를 자동으로 동기화합니다.</p>
             </div>
             <Link href="/gitops/new">
@@ -64,9 +64,9 @@ export default function GitOpsPage() {
                                         <span className="truncate max-w-xs">{repo.url}</span>
                                         <span className="flex items-center gap-1">
                                             <FiClock size={14} /> 
-                                            마지막 동기화: {repo.lastSync ? new Date(repo.lastSync).toLocaleString() : 'Never'}
+                                            마지막 동기화: {repo.lastSync ? new Date(repo.lastSync).toLocaleString() : '없음'}
                                         </span>
-                                        {repo.autoSync && <span className="text-emerald-500 text-xs border border-emerald-500/30 px-1 rounded">Auto-Sync On</span>}
+                                        {repo.autoSync && <span className="text-emerald-500 text-xs border border-emerald-500/30 px-1 rounded">자동 동기화</span>}
                                     </div>
                                 </div>
                             </div>
@@ -76,7 +76,7 @@ export default function GitOpsPage() {
                                     <input type="hidden" name="id" value={repo.id} />
                                     <Button variant="outline" size="sm" type="submit" disabled={repo.status === 'syncing'}>
                                         <FiRefreshCw className={`mr-2 ${repo.status === 'syncing' ? 'animate-spin' : ''}`} /> 
-                                        {repo.status === 'syncing' ? '동기화 중...' : 'Sync Now'}
+                                        {repo.status === 'syncing' ? '동기화 중...' : '지금 동기화'}
                                     </Button>
                                 </form>
                                 <form action={deleteGitRepoAction}>

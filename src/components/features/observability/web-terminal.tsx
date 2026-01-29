@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 
 export function WebTerminal() {
-  const [history, setHistory] = useState<string[]>(['Welcome to Jacon Remote Shell v1.0', 'Type "help" to see available commands.']);
+  const [history, setHistory] = useState<string[]>(['Jacon 원격 셸 v1.0에 오신 것을 환영합니다', '사용 가능한 명령어를 보려면 "help"를 입력하세요.']);
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -22,7 +22,7 @@ export function WebTerminal() {
     
     switch(command) {
         case 'help':
-            output = 'Available commands: help, ls, ps, whoami, top, clear, exit';
+            output = '사용 가능한 명령어: help, ls, ps, whoami, top, clear, exit';
             break;
         case 'ls':
             output = 'index.js  package.json  node_modules/  src/  public/';
@@ -37,15 +37,15 @@ export function WebTerminal() {
             output = 'Mem: 24652K used, 143324K free, 0K shrd, 0K buff, 13436K cached\nCPU:   0% usr   0% sys   0% nic 100% idle   0% io   0% irq   0% sirq';
             break;
         case 'clear':
-            setHistory(['Console cleared.']);
+            setHistory(['콘솔이 지워졌습니다.']);
             return;
         case 'exit':
-             output = 'Session terminated.';
+             output = '세션이 종료되었습니다.';
              break;
         case '':
             break;
         default:
-            output = `bash: ${command}: command not found`;
+            output = `bash: ${command}: 명령어를 찾을 수 없음`;
     }
 
     setHistory(prev => [...prev, `$ ${cmd}`, ...(output ? output.split('\n') : [])]);

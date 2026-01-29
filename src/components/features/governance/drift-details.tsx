@@ -18,21 +18,21 @@ export function DriftDetails({ item, onSync }: DriftDetailsProps) {
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex items-center gap-2 text-amber-500">
            <FiAlertCircle />
-           <CardTitle className="text-base">Drift Detected: {item.resourceKind} / {item.resourceName}</CardTitle>
+           <CardTitle className="text-base">드리프트 감지됨: {item.resourceKind} / {item.resourceName}</CardTitle>
         </div>
         <div className="flex gap-2">
            <Button size="sm" variant="outline" className="border-amber-500/50 text-amber-400 hover:bg-amber-500/10">
-              Ignore
+              무시
            </Button>
            <Button size="sm" onClick={onSync}>
-              <FiGitMerge className="mr-2" /> Adjust State (Sync)
+              <FiGitMerge className="mr-2" /> 상태 조정 (동기화)
            </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
          <div className="grid grid-cols-2 gap-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">
-            <div>Declared (Git/Template)</div>
-            <div>Actual (Live Cluster)</div>
+            <div>선언된 상태 (Git/템플릿)</div>
+            <div>실제 상태 (라이브 클러스터)</div>
          </div>
          
          <DiffViewer 
@@ -41,7 +41,7 @@ export function DriftDetails({ item, onSync }: DriftDetailsProps) {
          />
 
          <div className="text-xs text-slate-400 text-center">
-            Detected at: {new Date(item.detectedAt).toLocaleString()}
+            감지 시간: {new Date(item.detectedAt).toLocaleString()}
          </div>
       </CardContent>
     </Card>

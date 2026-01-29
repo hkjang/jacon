@@ -42,11 +42,11 @@ export default function PolicyPage() {
       <div className="flex flex-col gap-6 h-[calc(100vh-100px)]">
         <div className="flex items-center justify-between">
             <div>
-                <h1 className="text-2xl font-bold">Policy as Code (OPA)</h1>
+                <h1 className="text-2xl font-bold">코드로서의 정책 (OPA)</h1>
                 <p className="text-slate-400">Open Policy Agent를 사용하여 인프라 및 워크로드 규정을 준수합니다.</p>
             </div>
             <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700" onClick={handleCreatePolicy}>
-                <FiPlus /> New Policy
+                <FiPlus /> 새 정책
             </Button>
         </div>
 
@@ -96,10 +96,10 @@ export default function PolicyPage() {
                             </div>
                             <div className="flex gap-2">
                                 <Button variant="outline" size="sm" className="gap-2">
-                                    <FiCheckCircle /> Test
+                                    <FiCheckCircle /> 테스트
                                 </Button>
                                 <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 gap-2" onClick={handleSave}>
-                                    <FiSave /> Save
+                                    <FiSave /> 저장
                                 </Button>
                             </div>
                         </div>
@@ -119,7 +119,7 @@ export default function PolicyPage() {
                     <Card className="flex-1 flex items-center justify-center text-slate-500 border-dashed bg-slate-900/50">
                         <div className="text-center">
                             <FiShield size={48} className="mx-auto mb-4 opacity-30" />
-                            <p>Select a policy to edit or create a new one.</p>
+                            <p>편집할 정책을 선택하거나 새 정책을 생성하세요.</p>
                         </div>
                     </Card>
                 )}
