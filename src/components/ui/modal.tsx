@@ -189,7 +189,8 @@ export function FormModal({
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void | Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onConfirm: () => any;
   title: string;
   description: string;
   confirmLabel?: string;
@@ -306,7 +307,8 @@ export function ConfirmModal({
 interface DeleteConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void | Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onConfirm: () => any;
   resourceType: string;
   resourceName: string;
   loading?: boolean;

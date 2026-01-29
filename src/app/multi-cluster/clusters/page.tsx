@@ -240,7 +240,11 @@ export default function ClustersPage() {
   });
 
   // 폼 상태
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    provider: Cluster['provider'];
+    apiServer: string;
+  }>({
     name: '',
     provider: 'kubernetes',
     apiServer: '',

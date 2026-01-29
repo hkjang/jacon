@@ -597,6 +597,29 @@ class MockDatabase {
       return newWorkload;
   }
 
+  updateWorkload(id: string, updates: Partial<Workload>) {
+      if (!id) return null;
+      const w = this.workloads?.find(w => w.id === id);
+      if (w) {
+          Object.assign(w, updates);
+          this.addAuditLog('System', 'Update', `Workload/${w.name}`, 'Workload updated', 'Info', 'System');
+          return w;
+      }
+      return null;
+  }
+
+  deleteWorkload(id: string) {
+      if (!id) return false;
+      const idx = this.workloads?.findIndex(w => w.id === id) ?? -1;
+      if (idx !== -1) {
+          const removed = this.workloads[idx];
+          this.workloads.splice(idx, 1);
+          this.addAuditLog('System', 'Delete', `Workload/${removed.name}`, 'Workload deleted', 'Warning', 'System');
+          return true;
+      }
+      return false;
+  }
+
   updateWorkloadStatus(id: string, status: any) {
       if (!id) return null;
       const w = this.workloads?.find(w => w.id === id);
@@ -612,6 +635,91 @@ class MockDatabase {
       }
       return null;
   }
+
+  // --- Endpoint Operations (Enhanced) ---
+  updateEndpoint(id: string, updates: Partial<Endpoint>) {
+      if (!id) return null;
+      const ep = this.endpoints?.find(e => e.id === id);
+      if (ep) {
+          Object.assign(ep, updates);
+          this.addAuditLog('System', 'Update', `Endpoint/${ep.name}`, 'Endpoint updated', 'Info', 'System');
+          return ep;
+      }
+      return null;
+  }
+
+  deleteEndpoint(id: string) {
+      if (!id) return false;
+      const idx = this.endpoints?.findIndex(e => e.id === id) ?? -1;
+      if (idx !== -1) {
+          const removed = this.endpoints[idx];
+          this.endpoints.splice(idx, 1);
+          this.addAuditLog('System', 'Delete', `Endpoint/${removed.name}`, 'Endpoint removed', 'Warning', 'System');
+          return true;
+      }
+      return false;
+  }
+
+  // --- Config Operations ---
+  getConfigs() { return this.configs ?? []; }
+
+  getConfig(id: string) {
+      if (!id) return undefined;
+      return this.configs?.find(c => c.id === id);
+  }
+
+  addConfig(config: Partial<{ name: string; namespace: string; type: 'ConfigMap' | 'Secret'; data: Record<string, string> }>) {
+      const newConfig = {
+          id: `cfg-${Date.now()}`,
+          name: config.name || 'unnamed',
+          namespace: config.namespace || 'default',
+          type: config.type || 'ConfigMap' as const,
+          data: config.data || {},
+          keys: Object.keys(config.data || {}),
+          createdAt: new Date().toISOString()
+      };
+      if (!this.configs) this.configs = [];
+      this.configs.push(newConfig);
+      this.addAuditLog('System', 'Create', `Config/${newConfig.name}`, 'Config created', 'Info', 'System');
+      return newConfig;
+  }
+
+  updateConfig(id: string, updates: Partial<{ name: string; data: Record<string, string> }>) {
+      if (!id) return null;
+      const cfg = this.configs?.find(c => c.id === id);
+      if (cfg) {
+          if (updates.data) {
+              cfg.data = updates.data;
+              cfg.keys = Object.keys(updates.data);
+          }
+          if (updates.name) cfg.name = updates.name;
+          this.addAuditLog('System', 'Update', `Config/${cfg.name}`, 'Config updated', 'Info', 'System');
+          return cfg;
+      }
+      return null;
+  }
+
+  deleteConfig(id: string) {
+      if (!id || !this.configs) return false;
+      const idx = this.configs.findIndex(c => c.id === id);
+      if (idx !== -1) {
+          const removed = this.configs[idx];
+          this.configs.splice(idx, 1);
+          this.addAuditLog('System', 'Delete', `Config/${removed.name}`, 'Config deleted', 'Warning', 'System');
+          return true;
+      }
+      return false;
+  }
+
+  private configs: Array<{
+      id: string;
+      name: string;
+      namespace: string;
+      type: 'ConfigMap' | 'Secret';
+      data: Record<string, string>;
+      keys: string[];
+      createdAt: string;
+  }> = [];
 
   // --- Audit Operations ---
   getAuditLogs() { return (this.auditLogs ?? []).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); }

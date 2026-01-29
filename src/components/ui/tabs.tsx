@@ -9,19 +9,31 @@ const TabsContext = React.createContext<{
   orientation?: "horizontal" | "vertical";
 } | null>(null);
 
-interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
-  defaultValue: string;
+// TabItem for simple use cases
+export interface TabItem {
+  value: string;
+  label: string;
+  count?: number;
+}
+
+export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
+  defaultValue?: string;
+  value?: string;  // Controlled mode
   onValueChange?: (value: string) => void;
   orientation?: "horizontal" | "vertical";
 }
 
 const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
-  ({ className, defaultValue, onValueChange, orientation = "horizontal", children, ...props }, ref) => {
-    const [activeTab, setActiveTab] = React.useState(defaultValue);
+  ({ className, defaultValue, value, onValueChange, orientation = "horizontal", children, ...props }, ref) => {
+    // Support both controlled and uncontrolled modes
+    const [internalValue, setInternalValue] = React.useState(defaultValue || value || '');
+    const activeTab = value !== undefined ? value : internalValue;
 
-    const handleTabChange = (value: string) => {
-        setActiveTab(value);
-        onValueChange?.(value);
+    const handleTabChange = (newValue: string) => {
+        if (value === undefined) {
+            setInternalValue(newValue);
+        }
+        onValueChange?.(newValue);
     };
 
     return (
@@ -103,3 +115,4 @@ const TabsContent = React.forwardRef<
 TabsContent.displayName = "TabsContent"
 
 export { Tabs, TabsList, TabsTrigger, TabsContent }
+export type { TabsProps, TabItem }
