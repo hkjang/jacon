@@ -75,7 +75,7 @@ export interface EndpointGroup {
 export interface Registry {
   id: string;
   name: string;
-  type: 'dockerhub' | 'acr' | 'ecr' | 'gcr' | 'other';
+  type: 'dockerhub' | 'acr' | 'ecr' | 'gcr' | 'harbor' | 'other';
   url: string;
   username?: string;
   associatedEndpoints: string[];

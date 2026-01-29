@@ -44,61 +44,44 @@ export async function addGitRepoAction(prevState: any, formData: FormData) {
   redirect('/gitops');
 }
 
-export async function syncGitRepoAction(formData: FormData) {
-  try {
-    const id = formData.get('id') as string;
+export async function syncGitRepoAction(formData: FormData): Promise<void> {
+  const id = formData.get('id') as string;
 
-    if (!id) {
-      return { error: '동기화할 저장소 ID가 필요합니다.' };
-    }
-
-    // Check if repo exists
-    const repos = db.getGitRepos();
-    const repo = repos?.find(r => r.id === id);
-    if (!repo) {
-      return { error: '저장소를 찾을 수 없습니다.' };
-    }
-
-    // Set to syncing immediately
-    db.updateGitRepoStatus(id, 'syncing');
-
-    // In a real app, this would queue a job. Here we just revalidate to show 'syncing'
-    // But since server actions are request/response, we can't easily do background updates
-    // without an external worker or efficient state polling.
-    // For this mock, we will wait 1 second then set to synced.
-
-    // NOTE: This blocks the response for 1s.
-    await new Promise(r => setTimeout(r, 1000));
-    db.updateGitRepoStatus(id, 'synced', new Date().toISOString());
-
-    revalidatePath('/gitops');
-    return { success: true };
-  } catch (error) {
-    console.error('Sync git repo error:', error);
-    return { error: '저장소 동기화 중 오류가 발생했습니다.' };
+  if (!id) {
+    return;
   }
+
+  // Check if repo exists
+  const repos = db.getGitRepos();
+  const repo = repos?.find(r => r.id === id);
+  if (!repo) {
+    return;
+  }
+
+  // Set to syncing immediately
+  db.updateGitRepoStatus(id, 'syncing');
+
+  // NOTE: This blocks the response for 1s.
+  await new Promise(r => setTimeout(r, 1000));
+  db.updateGitRepoStatus(id, 'synced', new Date().toISOString());
+
+  revalidatePath('/gitops');
 }
 
-export async function deleteGitRepoAction(formData: FormData) {
-  try {
-    const id = formData.get('id') as string;
+export async function deleteGitRepoAction(formData: FormData): Promise<void> {
+  const id = formData.get('id') as string;
 
-    if (!id) {
-      return { error: '삭제할 저장소 ID가 필요합니다.' };
-    }
-
-    // Check if repo exists
-    const repos = db.getGitRepos();
-    const repo = repos?.find(r => r.id === id);
-    if (!repo) {
-      return { error: '저장소를 찾을 수 없습니다.' };
-    }
-
-    db.removeGitRepo(id);
-    revalidatePath('/gitops');
-    return { success: true };
-  } catch (error) {
-    console.error('Delete git repo error:', error);
-    return { error: '저장소 삭제 중 오류가 발생했습니다.' };
+  if (!id) {
+    return;
   }
+
+  // Check if repo exists
+  const repos = db.getGitRepos();
+  const repo = repos?.find(r => r.id === id);
+  if (!repo) {
+    return;
+  }
+
+  db.removeGitRepo(id);
+  revalidatePath('/gitops');
 }

@@ -88,34 +88,26 @@ export async function updateStackAction(input: StackUpdateInput) {
   }
 }
 
-export async function deleteStackAction(formData: FormData) {
-  try {
-    const id = formData.get('id') as string;
-    const confirmName = formData.get('confirmName') as string;
+export async function deleteStackAction(formData: FormData): Promise<void> {
+  const id = formData.get('id') as string;
+  const confirmName = formData.get('confirmName') as string;
 
-    const stack = db.getStack(id);
+  const stack = db.getStack(id);
 
-    if (!stack) {
-      return { success: false, error: '스택을 찾을 수 없습니다.' };
-    }
-
-    if (confirmName !== stack.name) {
-      return { success: false, error: '스택 이름이 일치하지 않습니다.' };
-    }
-
-    db.deleteStack(id);
-
-    db.addAuditLog('System', 'Delete', `Stack/${stack.name}`, 'Stack deleted', 'Warning');
-
-    revalidatePath('/stacks');
-    redirect('/stacks');
-  } catch (error: any) {
-    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
-      throw error;
-    }
-    console.error('Failed to delete stack:', error);
-    return { success: false, error: error.message };
+  if (!stack) {
+    return;
   }
+
+  // confirmName이 제공되면 검증 (선택적)
+  if (confirmName && confirmName !== stack.name) {
+    return;
+  }
+
+  db.deleteStack(id);
+  db.addAuditLog('System', 'Delete', `Stack/${stack.name}`, 'Stack deleted', 'Warning');
+
+  revalidatePath('/stacks');
+  redirect('/stacks');
 }
 
 export async function deployStackAction(id: string) {
