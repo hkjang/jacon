@@ -4,7 +4,7 @@ import React, { useActionState, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FiMail, FiLock, FiAlertCircle, FiGithub, FiGlobe } from 'react-icons/fi';
-import { loginAction } from '@/lib/auth-actions';
+import { loginAction, verifyMfaAction } from '@/lib/auth-actions';
 
 const initialState = {
   error: '',
@@ -12,7 +12,62 @@ const initialState = {
 
 export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
+  const [mfaState, mfaAction, isMfaPending] = useActionState(verifyMfaAction, { error: '' });
   const [activeTab, setActiveTab] = useState<'local' | 'sso'>('local');
+
+  // If Login returned MFA required, show MFA form
+  if (state?.status === 'mfa_required') {
+      return (
+          <div className="w-full bg-slate-900 border border-slate-800 rounded-lg p-6 shadow-xl animate-in fade-in slide-in-from-right-4">
+              <div className="text-center mb-6">
+                  <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
+                      <FiLock size={24} />
+                  </div>
+                  <h2 className="text-xl font-bold text-slate-200">2단계 인증</h2>
+                  <p className="text-sm text-slate-400 mt-2">인증 앱에 표시된 6자리 코드를 입력하세요.</p>
+              </div>
+
+              <form action={mfaAction} className="flex flex-col gap-4">
+                  <input type="hidden" name="userId" value={state.userId} />
+                  
+                  {mfaState?.error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded text-sm flex items-center gap-2">
+                        <FiAlertCircle />
+                        {mfaState.error}
+                    </div>
+                  )}
+
+                  <div className="space-y-1">
+                      <label className="text-sm font-medium text-slate-300">인증 코드</label>
+                      <Input 
+                        name="code" 
+                        placeholder="000000" 
+                        className="text-center text-lg tracking-widest font-mono" 
+                        maxLength={6}
+                        autoFocus
+                        required 
+                      />
+                  </div>
+
+                  <Button 
+                      type="submit" 
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 mt-2" 
+                      disabled={isMfaPending}
+                  >
+                    {isMfaPending ? '확인 중...' : '인증하기'}
+                  </Button>
+                  
+                  <button 
+                    type="button"
+                    onClick={() => window.location.reload()} 
+                    className="text-white text-xs hover:underline text-center mt-2"
+                  >
+                    로그인 화면으로 돌아가기
+                  </button>
+              </form>
+          </div>
+      );
+  }
 
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-lg p-6 shadow-xl">

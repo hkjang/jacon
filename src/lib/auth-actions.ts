@@ -35,8 +35,15 @@ export async function loginAction(prevState: any, formData: FormData) {
   // 4. Success - Reset failures
   db.resetFailedLogin(user.id);
 
-  // 5. MFA Check (Phase 1.5 - Placeholder for now, can implement later if needed immediately)
-  // if (user.mfaEnabled) { return { status: 'mfa_required', userId: user.id }; }
+  // 5. MFA Check
+  if (user.mfaEnabled) { 
+      return { 
+          status: 'mfa_required', 
+          userId: user.id,
+          // In a real app, we would sign a temporary JWT here to authorize the MFA step
+          tempToken: `mfa_pending_${user.id}_${Date.now()}` 
+      }; 
+  }
 
   // 6. Create Session
   const session = db.createSession(user.id, '127.0.0.1', 'Mozilla/5.0');
@@ -45,6 +52,35 @@ export async function loginAction(prevState: any, formData: FormData) {
   db.addAuditLog(user.email, 'Login', 'System', 'Login successful via Web', 'Info', '127.0.0.1');
 
   // 8. Set Cookie
+  const cookieStore = await cookies();
+  cookieStore.set('jacon_session', session.sessionId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    expires: new Date(session.expiresAt)
+  });
+
+  return { success: true };
+}
+
+export async function verifyMfaAction(prevState: any, formData: FormData) {
+  const userId = formData.get('userId') as string;
+  const code = formData.get('code') as string;
+  
+  // Mock validation: accept '123456'
+  if (code !== '123456') {
+      return { error: '인증 코드가 올바르지 않습니다.' };
+  }
+
+  const user = db.getUsers().find(u => u.id === userId);
+  if (!user) return { error: '사용자를 찾을 수 없습니다.' };
+
+  // Create Session (Success)
+  const session = db.createSession(user.id, '127.0.0.1', 'Mozilla/5.0');
+  
+  db.addAuditLog(user.email, 'Login', 'System', 'MFA verified, Login successful', 'Info', '127.0.0.1');
+
   const cookieStore = await cookies();
   cookieStore.set('jacon_session', session.sessionId, {
     httpOnly: true,
