@@ -38,6 +38,18 @@ export interface Stack {
   updatedAt: string;
 }
 
+export interface GitRepo {
+  id: string;
+  name: string;
+  url: string;
+  branch: string;
+  authType: 'public' | 'token' | 'ssh';
+  lastSync: string | null;
+  status: 'synced' | 'syncing' | 'failed' | 'pending';
+  autoSync: boolean;
+  createdAt: string;
+}
+
 // Simulated Database Class
 class MockDatabase {
   private static instance: MockDatabase;
@@ -50,6 +62,7 @@ class MockDatabase {
   public sessions: Session[];
   public apiTokens: ApiToken[];
   public stacks: Stack[];
+  public gitRepos: GitRepo[];
 
   private constructor() {
     this.users = MOCK_USERS.map(u => ({
@@ -77,6 +90,19 @@ class MockDatabase {
             updatedAt: new Date().toISOString()
         }
     ];
+    this.gitRepos = [
+        {
+            id: 'repo-1',
+            name: 'jacon-demo-apps',
+            url: 'https://github.com/jacon-io/demo-apps.git',
+            branch: 'main',
+            authType: 'public',
+            lastSync: new Date().toISOString(),
+            status: 'synced',
+            autoSync: true,
+            createdAt: new Date().toISOString()
+        }
+    ];
     
     console.log('Mock Database Initialized with Enterprise Schema');
   }
@@ -86,6 +112,45 @@ class MockDatabase {
       MockDatabase.instance = new MockDatabase();
     }
     return MockDatabase.instance;
+  }
+
+  // --- GitOps Operations ---
+  getGitRepos() { return this.gitRepos; }
+  
+  addGitRepo(repo: Partial<GitRepo>) {
+      const newRepo: GitRepo = {
+          id: `repo-${Date.now()}`,
+          name: repo.name || 'Untitled Repo',
+          url: repo.url || '',
+          branch: repo.branch || 'main',
+          authType: repo.authType || 'public',
+          lastSync: null,
+          status: 'pending',
+          autoSync: repo.autoSync || false,
+          createdAt: new Date().toISOString()
+      };
+      this.gitRepos.push(newRepo);
+      this.addAuditLog('System', 'Register', `GitRepo/${newRepo.name}`, 'Repository connected', 'Info');
+      return newRepo;
+  }
+
+  removeGitRepo(id: string) {
+      const idx = this.gitRepos.findIndex(r => r.id === id);
+      if (idx !== -1) {
+          const removed = this.gitRepos[idx];
+          this.gitRepos.splice(idx, 1);
+          this.addAuditLog('System', 'Remove', `GitRepo/${removed.name}`, 'Repository disconnected', 'Warning');
+          return true;
+      }
+      return false;
+  }
+
+  updateGitRepoStatus(id: string, status: GitRepo['status'], lastSync?: string) {
+      const repo = this.gitRepos.find(r => r.id === id);
+      if (repo) {
+          repo.status = status;
+          if (lastSync) repo.lastSync = lastSync;
+      }
   }
 
   // --- Stack Operations ---
