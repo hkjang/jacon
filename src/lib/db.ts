@@ -26,6 +26,18 @@ export interface ApiToken {
   lastUsed?: string;
 }
 
+export interface Stack {
+  id: string;
+  name: string;
+  type: 'compose' | 'kubernetes';
+  content: string; // YAML content
+  envVars: Record<string, string>;
+  status: 'active' | 'inactive' | 'deploying' | 'failed';
+  endpointId: string; // Where it is deployed
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Simulated Database Class
 class MockDatabase {
   private static instance: MockDatabase;
@@ -37,6 +49,7 @@ class MockDatabase {
   public auditLogs: AuditLog[];
   public sessions: Session[];
   public apiTokens: ApiToken[];
+  public stacks: Stack[];
 
   private constructor() {
     this.users = MOCK_USERS.map(u => ({
@@ -51,6 +64,19 @@ class MockDatabase {
     this.auditLogs = [...MOCK_AUDIT_LOGS];
     this.sessions = [];
     this.apiTokens = [];
+    this.stacks = [
+        {
+            id: 'stack-1',
+            name: 'web-app-production',
+            type: 'compose',
+            content: 'version: "3"\nservices:\n  web:\n    image: nginx:latest\n    ports:\n      - "80:80"',
+            envVars: { 'NODE_ENV': 'production' },
+            status: 'active',
+            endpointId: 'ep-1',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        }
+    ];
     
     console.log('Mock Database Initialized with Enterprise Schema');
   }
@@ -60,6 +86,61 @@ class MockDatabase {
       MockDatabase.instance = new MockDatabase();
     }
     return MockDatabase.instance;
+  }
+
+  // --- Stack Operations ---
+  getStacks() { return this.stacks; }
+  
+  getStack(id: string) { return this.stacks.find(s => s.id === id); }
+  
+  createStack(stack: Partial<Stack>) {
+      const newStack: Stack = {
+          id: `stack-${Date.now()}`,
+          name: stack.name || 'Untitled Stack',
+          type: stack.type || 'compose',
+          content: stack.content || '',
+          envVars: stack.envVars || {},
+          status: 'deploying', // Start as deploying mostly
+          endpointId: stack.endpointId || 'default',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+      };
+      this.stacks.push(newStack);
+      
+      // Simulate deployment finish
+      setTimeout(() => {
+          newStack.status = 'active';
+      }, 2000);
+      
+      this.addAuditLog('System', 'Create', `Stack/${newStack.name}`, 'Stack created and deployment started', 'Info');
+      return newStack;
+  }
+
+  updateStack(id: string, updates: Partial<Stack>) {
+      const stack = this.stacks.find(s => s.id === id);
+      if (stack) {
+          Object.assign(stack, updates);
+          stack.updatedAt = new Date().toISOString();
+          
+          if (updates.content || updates.envVars) {
+             stack.status = 'deploying';
+             setTimeout(() => { stack.status = 'active'; }, 2000);
+             this.addAuditLog('System', 'Update', `Stack/${stack.name}`, 'Stack re-deployed due to changes', 'Info');
+          }
+          return stack;
+      }
+      return null;
+  }
+
+  deleteStack(id: string) {
+      const idx = this.stacks.findIndex(s => s.id === id);
+      if (idx !== -1) {
+          const removed = this.stacks[idx];
+          this.stacks.splice(idx, 1);
+          this.addAuditLog('System', 'Delete', `Stack/${removed.name}`, 'Stack deleted', 'Warning');
+          return true;
+      }
+      return false;
   }
 
   // --- Session Operations ---
