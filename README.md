@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Jacon - Enterprise GitOps Platform (Simulation)
+
+Jacon is a mocked, high-fidelity simulation of an Enterprise-grade Kubernetes/GitOps management platform. It demonstrates advanced concepts like multi-cluster management, OPA policy enforcement, edge operations, and real-time observability in a single Next.js applications.
+
+## Key Features
+
+### 🚀 Core Platform
+
+- **Workload Management**: View, edit, and restart simulated Kubernetes workloads.
+- **GitOps Integration**: Connect Git repositories and simulate synchronization.
+- **Drift Detection**: Automatic detection of configuration drift with 1-click sync.
+
+### 🛡️ Security & Governance
+
+- **Policy as Code (OPA)**: Write Rego policies with a built-in syntax checker simulation.
+- **IAM & RBAC**: Manage Users, Roles, and Permissions matrix.
+- **Audit Logs**: Comprehensive audit trail of all actions (Create/Update/Delete).
+
+### 🌐 Connectivity
+
+- **Multi-Cluster**: Manage "Production" vs "Staging" clusters.
+- **Edge Computing**: Monitor remote edge agents/stores with simulated heartbeats.
+- **Endpoint Groups**: Logical grouping of infrastructure resources.
+
+### 📊 Observability
+
+- **Real-time Monitoring**: Simulated CPU/Memory usage charts.
+- **Log Streaming**: Live log viewer for workloads.
+- **Web Terminal**: Interactive web-based shell simulation.
 
 ## Getting Started
 
-First, run the development server:
+1.  **Install Dependencies**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+    ```bash
+    npm install
+    ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2.  **Run Development Server**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    ```bash
+    npm run dev
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3.  **Open Browser**
+    Visit [http://localhost:3000](http://localhost:3000)
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app`: Next.js App Router pages.
+- `src/components`: Reusable UI components (shadcn/ui based).
+- `src/lib/db.ts`: **Core Simulation Engine**. This file acts as an in-memory database, storing the state of clusters, users, policies, etc. It resets on server restart.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework**: Next.js 14+ (App Router)
+- **Styling**: Tailwind CSS
+- **Icons**: React Icons (Feather)
+- **State Management**: React State + In-Memory Singleton (`db.ts`)

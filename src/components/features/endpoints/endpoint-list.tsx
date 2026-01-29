@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MOCK_ENDPOINTS, Endpoint } from '@/lib/mock-endpoints';
-import { FiPlus, FiServer, FiActivity, FiTag, FiMoreVertical } from 'react-icons/fi';
+import { db, Endpoint } from '@/lib/db';
+import { FiPlus, FiServer, FiActivity, FiTag, FiMoreVertical, FiWifi } from 'react-icons/fi';
 import { SiKubernetes, SiDocker } from 'react-icons/si';
 import { cn } from '@/lib/utils';
 import { useProject } from '@/hooks/use-project-context';
@@ -17,10 +17,11 @@ export function EndpointList() {
   const { currentProject } = useProject();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const filteredEndpoints = MOCK_ENDPOINTS.filter(ep => 
+  const endpoints = db.getEndpoints();
+  const filteredEndpoints = endpoints.filter(ep => 
     ep.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     ep.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -71,7 +72,10 @@ export function EndpointList() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                      <div className="flex items-center gap-3">
-                        <h3 className="font-bold text-lg text-slate-200">{ep.name}</h3>
+                        <h3 className="font-bold text-lg text-slate-200 flex items-center gap-2">
+                            {ep.name}
+                            {ep.isEdge && <span className="px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] border border-indigo-500/30">EDGE</span>}
+                        </h3>
                         <span className={cn(
                             "px-2 py-0.5 rounded text-[10px] font-bold uppercase border",
                             ep.status === 'Online' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :

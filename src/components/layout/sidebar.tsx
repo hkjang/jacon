@@ -5,8 +5,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import styles from './sidebar.module.css';
-import { FiGrid, FiBox, FiServer, FiActivity, FiSettings, FiShield, FiLayers } from 'react-icons/fi';
+import { FiGrid, FiBox, FiServer, FiActivity, FiSettings, FiShield, FiLayers, FiGlobe, FiPlay, FiGitBranch, FiUsers } from 'react-icons/fi';
 import { ProjectSwitcher } from '@/components/features/layout/project-switcher';
+
+const NavItem = ({ href, icon: Icon, label, currentPath }: any) => {
+  const isActive = currentPath.startsWith(href);
+  return (
+    <Link href={href} className={cn(styles.navItem, isActive && styles.active)}>
+      <Icon size={20} />
+      <span>{label}</span>
+    </Link>
+  );
+};
 
 const NAV_ITEMS = [
   { label: '대시보드', href: '/dashboard', icon: FiGrid },
@@ -49,6 +59,33 @@ export function Sidebar() {
             </Link>
           );
         })}
+      </nav>
+
+
+      <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-3">
+        Edge Compute
+      </h3>
+      <nav className="space-y-1">
+        <NavItem href="/edge" icon={FiActivity} label="에지 대시보드" currentPath={pathname} />
+        <NavItem href="/endpoints/groups" icon={FiLayers} label="엔드포인트 그룹" currentPath={pathname} />
+      </nav>
+
+      <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-3">
+        Multi-cluster
+      </h3>
+      <nav className="space-y-1">
+        <NavItem href="/multi-cluster/overview" icon={FiGlobe} label="개요" currentPath={pathname} />
+        <NavItem href="/multi-cluster/clusters" icon={FiServer} label="클러스터" currentPath={pathname} />
+      </nav>
+
+      <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-3">
+        설정
+      </h3>
+        <NavItem href="/settings/registries" icon={FiSettings} label="레지스트리" currentPath={pathname} />
+        <NavItem href="/settings/policy" icon={FiShield} label="정책 (OPA)" currentPath={pathname} />
+        <NavItem href="/settings/iam" icon={FiUsers} label="IAM 및 권한" currentPath={pathname} />
+        <NavItem href="/settings/config" icon={FiSettings} label="구성 관리" currentPath={pathname} />
+        <NavItem href="/settings/observability" icon={FiActivity} label="관측성" currentPath={pathname} />
       </nav>
 
       <div className={styles.footer}>

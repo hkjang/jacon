@@ -49,6 +49,26 @@ export interface GitRepo {
   autoSync: boolean;
   createdAt: string;
 }
+  createdAt: string;
+}
+
+export interface Policy {
+  id: string;
+  name: string;
+  description: string;
+  regoContent: string;
+  enforcementLevel: 'mandatory' | 'advisory';
+  target: 'kubernetes' | 'terraform' | 'api';
+  status: 'active' | 'disabled';
+}
+
+export interface IamRole {
+  id: string;
+  name: string;
+  type: 'system' | 'custom';
+  permissions: string[];
+  description: string;
+}
 
 // Simulated Database Class
 class MockDatabase {
@@ -62,7 +82,15 @@ class MockDatabase {
   public sessions: Session[];
   public apiTokens: ApiToken[];
   public stacks: Stack[];
+  public stacks: Stack[];
   public gitRepos: GitRepo[];
+  public endpoints: Endpoint[];
+  public endpointGroups: EndpointGroup[];
+  public endpoints: Endpoint[];
+  public endpointGroups: EndpointGroup[];
+  public registries: Registry[];
+  public policies: Policy[];
+  public iamRoles: IamRole[];
 
   private constructor() {
     this.users = MOCK_USERS.map(u => ({
@@ -103,6 +131,24 @@ class MockDatabase {
             createdAt: new Date().toISOString()
         }
     ];
+    this.registries = [
+        { id: 'reg-1', name: 'Docker Hub', type: 'dockerhub', url: 'https://index.docker.io/v1/', associatedEndpoints: ['ep-1', 'ep-5'] }
+    ];
+    this.policies = [
+        {
+            id: 'pol-1',
+            name: 'Disallow Latest Tag',
+            description: 'Ensure containers do not use the :latest tag',
+            regoContent: 'package kubernetes.validating\n\ndeny[msg] {\n  input.request.kind.kind == "Pod"\n  image := input.request.object.spec.containers[_].image\n  endswith(image, ":latest")\n  msg := sprintf("Image %v uses :latest tag", [image])\n}',
+            enforcementLevel: 'advisory',
+            target: 'kubernetes',
+            status: 'active'
+        }
+    ];
+    this.iamRoles = [
+        { id: 'role-admin', name: 'Administrator', type: 'system', description: 'Full access to all resources', permissions: ['*'] },
+        { id: 'role-readonly', name: 'Read Only', type: 'system', description: 'View-only access', permissions: ['read:*'] }
+    ];
     
     console.log('Mock Database Initialized with Enterprise Schema');
   }
@@ -114,6 +160,94 @@ class MockDatabase {
     return MockDatabase.instance;
   }
 
+  // --- Endpoint Operations ---
+  getEndpoints() { return this.endpoints; }
+  
+  getEdgeEndpoints() { return this.endpoints.filter(e => e.isEdge); }
+
+  addEndpoint(ep: Partial<Endpoint>) {
+      const newEp: Endpoint = {
+          id: `ep-${Date.now()}`,
+          projectId: ep.projectId || 'default',
+          name: ep.name || 'New Endpoint',
+          type: ep.type || 'Kubernetes',
+          status: 'Online',
+          url: ep.url || '',
+          version: 'v1.0.0',
+          tags: ep.tags || [],
+          lastSeen: 'Just now',
+          isEdge: ep.isEdge || false,
+          connectionMode: ep.connectionMode || 'direct',
+          groupId: ep.groupId
+      };
+      this.endpoints.push(newEp);
+      this.addAuditLog('System', 'Register', `Endpoint/${newEp.name}`, 'Endpoint registered', 'Info');
+      return newEp;
+  }
+
+  // --- Endpoint Group Operations ---
+  getEndpointGroups() { return this.endpointGroups; }
+
+  createEndpointGroup(group: Partial<EndpointGroup>) {
+      const newGroup: EndpointGroup = {
+          id: `group-${Date.now()}`,
+          name: group.name || 'Untitled Group',
+          description: group.description || '',
+          tags: group.tags || []
+      };
+      this.endpointGroups.push(newGroup);
+      return newGroup;
+  }
+
+  // --- Registry Operations ---
+  getRegistries() { return this.registries; }
+
+  addRegistry(reg: Partial<Registry>) {
+      const newReg: Registry = {
+          id: `reg-${Date.now()}`,
+          name: reg.name || 'New Registry',
+          type: reg.type || 'other',
+          url: reg.url || '',
+          associatedEndpoints: []
+      };
+      this.registries.push(newReg);
+      return newReg;
+  }
+
+      this.registries.push(newReg);
+      return newReg;
+  }
+
+  // --- Policy Operations ---
+  getPolicies() { return this.policies; }
+  
+  addPolicy(policy: Partial<Policy>) {
+      const newPol: Policy = {
+          id: `pol-${Date.now()}`,
+          name: policy.name || 'New Policy',
+          description: policy.description || '',
+          regoContent: policy.regoContent || '',
+          enforcementLevel: policy.enforcementLevel || 'advisory',
+          target: policy.target || 'kubernetes',
+          status: 'active'
+      };
+      this.policies.push(newPol);
+      this.addAuditLog('System', 'Create', `Policy/${newPol.name}`, 'Policy created', 'Warning');
+      return newPol;
+  }
+
+  updatePolicy(id: string, updates: Partial<Policy>) {
+      const pol = this.policies.find(p => p.id === id);
+      if (pol) {
+          Object.assign(pol, updates);
+          return pol;
+      }
+      return null;
+  }
+
+  // --- IAM Operations ---
+  getIamRoles() { return this.iamRoles; }
+  
   // --- GitOps Operations ---
   getGitRepos() { return this.gitRepos; }
   
