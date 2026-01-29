@@ -17,7 +17,7 @@ interface ProfileTabsProps {
 
 export function ProfileTabs({ user, sessions: initialSessions, apiTokens: initialTokens }: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'sessions' | 'tokens' | 'settings'>('general');
-  const [isSso] = useState(false); // Mock SSO state check (TODO: check from user source)
+  const isSso = user.isSso ?? false;
 
   const tabs = [
     { id: 'general', label: '기본 정보', icon: FiUser },

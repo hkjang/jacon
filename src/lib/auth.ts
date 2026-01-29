@@ -11,6 +11,7 @@ export interface User {
   mfaSecret?: string; // Simulated secret
   failedLoginAttempts?: number;
   lockUntil?: number; // Timestamp
+  isSso?: boolean; // Whether user authenticated via SSO
 }
 
 // Combine Admin Users and some regular users for login testing
